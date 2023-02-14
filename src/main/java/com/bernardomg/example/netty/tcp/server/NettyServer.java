@@ -1,9 +1,10 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
+import com.bernardomg.example.netty.tcp.server.channel.NettyChannelInitializer;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
@@ -16,30 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyServer implements Server {
 
-    private final EventLoopGroup                   bossLoopGroup;
+    private final EventLoopGroup bossLoopGroup   = new NioEventLoopGroup();
 
-    private final ChannelGroup                     channelGroup;
+    private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    private final Class<? extends PipelineFactory> pipelineFactoryClass;
+    private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
 
-    private final EventLoopGroup                   workerLoopGroup;
-
-    /**
-     * Initialize the netty server class
-     *
-     * @param pipelineFactoryType
-     *            {@link Class} of the piprline factory type
-     */
-    public NettyServer(final Class<? extends PipelineFactory> pipelineFactoryType) {
-        // Initialization private members
-
-        bossLoopGroup = new NioEventLoopGroup();
-
-        workerLoopGroup = new NioEventLoopGroup();
-
-        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-        pipelineFactoryClass = pipelineFactoryType;
+    public NettyServer() {
+        super();
     }
 
     /**
@@ -64,11 +49,8 @@ public final class NettyServer implements Server {
      */
     @Override
     public final void startup(final int port) throws Exception {
-        final ServerBootstrap    bootstrap;
-        final ChannelFuture      channelFuture;
-        @SuppressWarnings("rawtypes")
-        final ChannelInitializer initializer;
-        final PipelineFactory    pipelineFactory;
+        final ServerBootstrap bootstrap;
+        final ChannelFuture   channelFuture;
 
         bootstrap = new ServerBootstrap();
         bootstrap.group(bossLoopGroup, workerLoopGroup)
@@ -79,11 +61,7 @@ public final class NettyServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true);
 
-        pipelineFactory = pipelineFactoryClass.newInstance();
-
-        initializer = pipelineFactory.createInitializer();
-
-        bootstrap.childHandler(initializer);
+        bootstrap.childHandler(new NettyChannelInitializer());
 
         try {
             log.debug("Binding port {}", port);

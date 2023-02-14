@@ -19,7 +19,6 @@ package com.bernardomg.example.netty.tcp.cli.command;
 import java.io.PrintWriter;
 
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
-import com.bernardomg.example.netty.tcp.server.MessagePipelineFactory;
 import com.bernardomg.example.netty.tcp.server.NettyServer;
 import com.bernardomg.example.netty.tcp.server.Server;
 
@@ -71,7 +70,7 @@ public final class StartServerCommand implements Runnable {
         writer.println();
         writer.println("------------");
 
-        server = new NettyServer(MessagePipelineFactory.class);
+        server = new NettyServer();
 
         try {
             log.debug("Starting server");
