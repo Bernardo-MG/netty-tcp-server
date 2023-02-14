@@ -17,7 +17,7 @@ java -jar target/server.jar start 8080
 To show other commands:
 
 ```
-java -jar target/client.jar -h
+java -jar target/server.jar -h
 ```
 
 [![Release docs](https://img.shields.io/badge/docs-release-blue.svg)][site-release]
