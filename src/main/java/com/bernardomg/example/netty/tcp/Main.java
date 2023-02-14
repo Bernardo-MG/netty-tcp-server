@@ -12,8 +12,6 @@ public class Main {
     public static void main(final String[] args) {
         final Integer exitCode;
 
-        log.error("Error");
-
         exitCode = new CommandLine(new TcpServerMenu()).execute(args);
 
         // log.debug("Exited with code {}", exitCode);
