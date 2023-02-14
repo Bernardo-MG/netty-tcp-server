@@ -39,6 +39,7 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
         writer.println();
 
         writer.printf("Sending response: %s", response);
+        writer.println();
         buf = Unpooled.wrappedBuffer(response.getBytes());
 
         // Reply listener
