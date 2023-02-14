@@ -70,7 +70,7 @@ public final class StartServerCommand implements Runnable {
         writer.println();
         writer.println("------------");
 
-        server = new NettyServer();
+        server = new NettyServer(writer);
 
         try {
             log.debug("Starting server");

@@ -1,6 +1,8 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
+import java.io.PrintWriter;
+
 import com.bernardomg.example.netty.tcp.server.model.ImmutableMessage;
 
 import io.netty.buffer.ByteBuf;
@@ -10,8 +12,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 public final class NettySimpleChannelInboundHandler extends SimpleChannelInboundHandler<ImmutableMessage> {
 
-    public NettySimpleChannelInboundHandler() {
+    private final PrintWriter writer;
+
+    public NettySimpleChannelInboundHandler(final PrintWriter writ) {
         super();
+
+        writer = writ;
     }
 
     @Override
@@ -26,8 +32,8 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
         final ByteBuf       buf;
         final WriteListener listener;
 
-        // TODO: Send to console
-        System.out.println("Message Received : " + msg.getContent());
+        writer.printf("Received message: %s", msg.getContent());
+        writer.println();
 
         // TODO: The response should be configurable
         buf = Unpooled.wrappedBuffer("Hey Sameer Here!!!!".getBytes());
@@ -35,11 +41,9 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
         // Send reply
         listener = success -> {
             if (success) {
-                // TODO: Send to console
-                System.out.println("reply success");
+                writer.println("Successful reply");
             } else {
-                // TODO: Send to console
-                System.out.println("reply fail");
+                writer.println("Failed reply");
             }
         };
 
