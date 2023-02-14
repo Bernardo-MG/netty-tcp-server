@@ -23,13 +23,16 @@ public final class NettyServer implements Server {
 
     private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private final String         response;
+
     private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
 
     private final PrintWriter    writer;
 
-    public NettyServer(final PrintWriter writ) {
+    public NettyServer(final String resp, final PrintWriter writ) {
         super();
 
+        response = resp;
         writer = writ;
     }
 
@@ -67,7 +70,7 @@ public final class NettyServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true);
 
-        bootstrap.childHandler(new NettyChannelInitializer(writer));
+        bootstrap.childHandler(new NettyChannelInitializer(response, writer));
 
         try {
             log.debug("Binding port {}", port);

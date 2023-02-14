@@ -17,11 +17,14 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
 
     private final EventExecutorGroup executors;
 
+    private final String             response;
+
     private final PrintWriter        writer;
 
-    public NettyChannelInitializer(final PrintWriter writ) {
+    public NettyChannelInitializer(final String resp, final PrintWriter writ) {
         super();
 
+        response = resp;
         writer = writ;
 
         availableProcessors = Runtime.getRuntime()
@@ -36,7 +39,7 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
         pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new NettyByteToMessageDecoder());
-        pipeline.addLast(executors, "handler", new NettySimpleChannelInboundHandler(writer));
+        pipeline.addLast(executors, "handler", new NettySimpleChannelInboundHandler(response, writer));
 
     }
 

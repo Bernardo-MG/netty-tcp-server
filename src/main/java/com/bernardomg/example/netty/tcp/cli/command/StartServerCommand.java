@@ -42,6 +42,9 @@ public final class StartServerCommand implements Runnable {
     @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
     private Integer     port;
 
+    @Parameters(index = "1", description = "Server response", paramLabel = "RESP")
+    private String      response;
+
     /**
      * Command specification. Used to get the line output.
      */
@@ -66,11 +69,11 @@ public final class StartServerCommand implements Runnable {
         // Prints the final result
         writer.println();
         writer.println("------------");
-        writer.printf("Starting server at port %d", port);
+        writer.printf("Starting server and listening to port %d", port);
         writer.println();
         writer.println("------------");
 
-        server = new NettyServer(writer);
+        server = new NettyServer(response, writer);
 
         try {
             log.debug("Starting server");
