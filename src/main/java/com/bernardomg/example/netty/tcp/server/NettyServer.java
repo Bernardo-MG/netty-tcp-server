@@ -49,7 +49,7 @@ public final class NettyServer implements Server {
         final ServerBootstrap bootstrap;
         final ChannelFuture   channelFuture;
 
-        log.debug("Starting server");
+        log.trace("Starting server");
 
         // Activate Log4j logger factory
         InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
@@ -71,9 +71,8 @@ public final class NettyServer implements Server {
             // Child handler
             .childHandler(new NettyChannelInitializer(response, writer));
 
-        log.debug("Binding port {}", port);
-
         try {
+            log.debug("Binding port {}", port);
             channelFuture = bootstrap.bind(port)
                 .sync();
         } catch (final InterruptedException e) {
@@ -85,16 +84,19 @@ public final class NettyServer implements Server {
         }
 
         channelGroup.add(channelFuture.channel());
-        log.debug("Finished startup");
+
+        log.trace("Started server");
     }
 
     @Override
     public final void stop() {
-        log.debug("Stopping server");
+        log.trace("Stopping server");
 
         channelGroup.close();
         bossLoopGroup.shutdownGracefully();
         workerLoopGroup.shutdownGracefully();
+
+        log.trace("Stopped server");
     }
 
 }
