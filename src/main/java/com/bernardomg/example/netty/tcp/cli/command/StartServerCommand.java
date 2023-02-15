@@ -22,7 +22,6 @@ import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 import com.bernardomg.example.netty.tcp.server.NettyServer;
 import com.bernardomg.example.netty.tcp.server.Server;
 
-import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Parameters;
@@ -36,7 +35,6 @@ import picocli.CommandLine.Spec;
  */
 @Command(name = "start", description = "Starts a TCP server", mixinStandardHelpOptions = true,
         versionProvider = ManifestVersionProvider.class)
-@Slf4j
 public final class StartServerCommand implements Runnable {
 
     @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
@@ -75,15 +73,7 @@ public final class StartServerCommand implements Runnable {
 
         server = new NettyServer(port, response, writer);
 
-        try {
-            log.debug("Starting server");
-            server.startup();
-            log.debug("Started server");
-        } catch (final Exception e) {
-            // TODO Auto-generated catch block
-            log.error(e.getLocalizedMessage(), e);
-            e.printStackTrace();
-        }
+        server.start();
     }
 
 }

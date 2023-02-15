@@ -2,6 +2,7 @@
 package com.bernardomg.example.netty.tcp.server;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import com.bernardomg.example.netty.tcp.server.channel.NettyChannelInitializer;
 
@@ -38,52 +39,62 @@ public final class NettyServer implements Server {
     public NettyServer(final Integer prt, final String resp, final PrintWriter writ) {
         super();
 
-        port = prt;
-        response = resp;
-        writer = writ;
+        port = Objects.requireNonNull(prt);
+        response = Objects.requireNonNull(resp);
+        writer = Objects.requireNonNull(writ);
     }
 
     @Override
-    public final void shutdown() throws Exception {
-        log.debug("Server shutdown");
-
-        channelGroup.close();
-        bossLoopGroup.shutdownGracefully();
-        workerLoopGroup.shutdownGracefully();
-    }
-
-    @Override
-    public final void startup() throws Exception {
+    public final void start() {
         final ServerBootstrap bootstrap;
         final ChannelFuture   channelFuture;
 
-        log.debug("Server startup");
-        
+        log.debug("Starting server");
+
+        // Activate Log4j logger factory
         InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
 
         bootstrap = new ServerBootstrap();
-        bootstrap.group(bossLoopGroup, workerLoopGroup)
+        bootstrap
+            // Registers groups
+            .group(bossLoopGroup, workerLoopGroup)
+            // Defines channel
             .channel(NioServerSocketChannel.class)
+            // Adds logging
             .handler(new LoggingHandler(LogLevel.INFO))
+            // Configuration
             .option(ChannelOption.SO_BACKLOG, 1024)
             .option(ChannelOption.AUTO_CLOSE, true)
             .option(ChannelOption.SO_REUSEADDR, true)
             .childOption(ChannelOption.SO_KEEPALIVE, true)
-            .childOption(ChannelOption.TCP_NODELAY, true);
+            .childOption(ChannelOption.TCP_NODELAY, true)
+            // Child handler
+            .childHandler(new NettyChannelInitializer(response, writer));
 
-        bootstrap.childHandler(new NettyChannelInitializer(response, writer));
+        log.debug("Binding port {}", port);
 
         try {
-            log.debug("Binding port {}", port);
             channelFuture = bootstrap.bind(port)
                 .sync();
-            channelGroup.add(channelFuture.channel());
-            log.debug("Finished startup");
-        } catch (final Exception e) {
+        } catch (final InterruptedException e) {
             log.error(e.getLocalizedMessage(), e);
-            shutdown();
-            throw e;
+            stop();
+
+            // Rethrows exception
+            throw new RuntimeException(e);
         }
+
+        channelGroup.add(channelFuture.channel());
+        log.debug("Finished startup");
+    }
+
+    @Override
+    public final void stop() {
+        log.debug("Stopping server");
+
+        channelGroup.close();
+        bossLoopGroup.shutdownGracefully();
+        workerLoopGroup.shutdownGracefully();
     }
 
 }

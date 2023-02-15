@@ -1,21 +1,27 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
+/**
+ * Represents a server, and allows starting and stopping it.
+ *
+ * @author bernardo.martinezg
+ *
+ */
 public interface Server {
 
     /**
-     * Shutdown the server
-     *
-     * @throws Exception
-     */
-    public void shutdown() throws Exception;
-
-    /**
-     * Startup the TCP server
+     * Starts the server.
      *
      * @throws Exception
      *             if any {@link Exception}
      */
-    public void startup() throws Exception;
+    public void start();
+
+    /**
+     * Stops the server.
+     *
+     * @throws Exception
+     */
+    public void stop();
 
 }
