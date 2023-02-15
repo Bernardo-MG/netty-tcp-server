@@ -1,17 +1,26 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
-import com.bernardomg.example.netty.tcp.server.model.ImmutableMessage;
+import java.io.PrintWriter;
+
+import com.bernardomg.example.netty.tcp.server.model.Message;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-public final class NettySimpleChannelInboundHandler extends SimpleChannelInboundHandler<ImmutableMessage> {
+public final class NettySimpleChannelInboundHandler extends SimpleChannelInboundHandler<Message> {
 
-    public NettySimpleChannelInboundHandler() {
+    private final String      response;
+
+    private final PrintWriter writer;
+
+    public NettySimpleChannelInboundHandler(final String resp, final PrintWriter writ) {
         super();
+
+        response = resp;
+        writer = writ;
     }
 
     @Override
@@ -22,24 +31,23 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
     }
 
     @Override
-    protected final void channelRead0(final ChannelHandlerContext ctx, final ImmutableMessage msg) throws Exception {
+    protected final void channelRead0(final ChannelHandlerContext ctx, final Message msg) throws Exception {
         final ByteBuf       buf;
         final WriteListener listener;
 
-        // TODO: Send to console
-        System.out.println("Message Received : " + msg.getContent());
+        writer.printf("Received message: %s", msg.getContent());
+        writer.println();
 
-        // TODO: The response should be configurable
-        buf = Unpooled.wrappedBuffer("Hey Sameer Here!!!!".getBytes());
+        writer.printf("Sending response: %s", response);
+        writer.println();
+        buf = Unpooled.wrappedBuffer(response.getBytes());
 
-        // Send reply
+        // Reply listener
         listener = success -> {
             if (success) {
-                // TODO: Send to console
-                System.out.println("reply success");
+                writer.println("Successful reply");
             } else {
-                // TODO: Send to console
-                System.out.println("reply fail");
+                writer.println("Failed reply");
             }
         };
 

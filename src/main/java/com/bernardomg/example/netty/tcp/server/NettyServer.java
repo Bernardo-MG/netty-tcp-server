@@ -1,6 +1,8 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
+import java.io.PrintWriter;
+
 import com.bernardomg.example.netty.tcp.server.channel.NettyChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -21,10 +23,17 @@ public final class NettyServer implements Server {
 
     private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private final String         response;
+
     private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
 
-    public NettyServer() {
+    private final PrintWriter    writer;
+
+    public NettyServer(final String resp, final PrintWriter writ) {
         super();
+
+        response = resp;
+        writer = writ;
     }
 
     /**
@@ -61,7 +70,7 @@ public final class NettyServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true);
 
-        bootstrap.childHandler(new NettyChannelInitializer());
+        bootstrap.childHandler(new NettyChannelInitializer(response, writer));
 
         try {
             log.debug("Binding port {}", port);

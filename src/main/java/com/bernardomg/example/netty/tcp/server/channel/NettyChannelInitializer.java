@@ -1,6 +1,8 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
+import java.io.PrintWriter;
+
 import com.bernardomg.example.netty.tcp.server.codec.NettyByteToMessageDecoder;
 
 import io.netty.channel.ChannelInitializer;
@@ -15,8 +17,15 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
 
     private final EventExecutorGroup executors;
 
-    public NettyChannelInitializer() {
+    private final String             response;
+
+    private final PrintWriter        writer;
+
+    public NettyChannelInitializer(final String resp, final PrintWriter writ) {
         super();
+
+        response = resp;
+        writer = writ;
 
         availableProcessors = Runtime.getRuntime()
             .availableProcessors();
@@ -30,7 +39,7 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
         pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new NettyByteToMessageDecoder());
-        pipeline.addLast(executors, "handler", new NettySimpleChannelInboundHandler());
+        pipeline.addLast(executors, "handler", new NettySimpleChannelInboundHandler(response, writer));
 
     }
 

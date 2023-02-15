@@ -44,7 +44,7 @@ public final class ManifestVersionProvider implements IVersionProvider {
     /**
      * Project title. Used to identify the correct manifest.
      */
-    private static final String project = "Dice Notation Tools CLI";
+    private static final String project = "Netty TCP Server Example";
 
     /**
      * Default constructor.
