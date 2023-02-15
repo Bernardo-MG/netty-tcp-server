@@ -43,7 +43,7 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
             .availableProcessors();
 
         executors = new DefaultEventExecutorGroup(availableProcessors);
-        inboundHandler = new NettySimpleChannelInboundHandler(response, writer);
+        inboundHandler = new NettyChannelInboundHandler(response, writer);
         pipeline.addLast(executors, "handler", inboundHandler);
 
         log.debug("Initialized channel");

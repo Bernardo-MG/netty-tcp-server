@@ -10,13 +10,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class NettySimpleChannelInboundHandler extends ChannelInboundHandlerAdapter {
+public final class NettyChannelInboundHandler extends ChannelInboundHandlerAdapter {
 
     private final String      response;
 
     private final PrintWriter writer;
 
-    public NettySimpleChannelInboundHandler(final String resp, final PrintWriter writ) {
+    public NettyChannelInboundHandler(final String resp, final PrintWriter writ) {
         super();
 
         response = resp;
