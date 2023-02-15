@@ -60,12 +60,21 @@ public final class NettyTcpServer implements Server {
 
     private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    /**
+     * Port which the server will listen to.
+     */
     private final Integer        port;
 
+    /**
+     * Response to send after a request.
+     */
     private final String         response;
 
     private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
 
+    /**
+     * CLI writer, to print console messages.
+     */
     private final PrintWriter    writer;
 
     public NettyTcpServer(final Integer prt, final String resp, final PrintWriter writ) {
@@ -82,6 +91,12 @@ public final class NettyTcpServer implements Server {
         final ChannelFuture   channelFuture;
 
         log.trace("Starting server");
+
+        writer.println();
+        writer.println("------------");
+        writer.printf("Starting server and listening to port %d", port);
+        writer.println();
+        writer.println("------------");
 
         // Activate Log4j logger factory
         InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);

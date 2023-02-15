@@ -36,7 +36,7 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
 /**
- * Dice gatherer command. Receives an expression, gets all the dice sets on it and prints the result on screen.
+ * Start server command.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
@@ -71,13 +71,6 @@ public final class StartServerCommand implements Runnable {
 
         writer = spec.commandLine()
             .getOut();
-
-        // Prints the final result
-        writer.println();
-        writer.println("------------");
-        writer.printf("Starting server and listening to port %d", port);
-        writer.println();
-        writer.println("------------");
 
         server = new NettyTcpServer(port, response, writer);
 
