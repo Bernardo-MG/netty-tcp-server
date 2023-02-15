@@ -13,7 +13,11 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -54,10 +58,13 @@ public final class NettyServer implements Server {
         final ChannelFuture   channelFuture;
 
         log.debug("Server startup");
+        
+        InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
 
         bootstrap = new ServerBootstrap();
         bootstrap.group(bossLoopGroup, workerLoopGroup)
             .channel(NioServerSocketChannel.class)
+            .handler(new LoggingHandler(LogLevel.INFO))
             .option(ChannelOption.SO_BACKLOG, 1024)
             .option(ChannelOption.AUTO_CLOSE, true)
             .option(ChannelOption.SO_REUSEADDR, true)
