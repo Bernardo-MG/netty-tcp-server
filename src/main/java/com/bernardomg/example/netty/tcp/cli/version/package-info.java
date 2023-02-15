@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 /**
- * Project root package. Contains the executable class.
+ * CLI commands for showing the version.
  */
 
-package com.bernardomg.example.netty.tcp;
+package com.bernardomg.example.netty.tcp.cli.version;
