@@ -72,6 +72,7 @@ public final class NettyServer implements Server {
             .childHandler(new NettyChannelInitializer(response, writer));
 
         try {
+            // Binds to the port
             log.debug("Binding port {}", port);
             channelFuture = bootstrap.bind(port)
                 .sync();
