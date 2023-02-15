@@ -127,6 +127,11 @@ public final class NettyTcpServer implements Server {
             throw new RuntimeException(e);
         }
 
+
+        if (channelFuture.isSuccess()) {
+            log.debug("Bound correctly to port {}",port);
+        }
+
         channelGroup.add(channelFuture.channel());
 
         log.trace("Started server");
