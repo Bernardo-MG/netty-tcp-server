@@ -42,8 +42,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
@@ -143,38 +141,39 @@ public final class NettyTcpServer implements Server {
      *            response received
      */
     private final void handleRequest(final ChannelHandlerContext ctx, final String msg) {
-        printRequest(msg);
-        sendResponse(ctx, msg);
-    }
-
-    private final void printRequest(final String msg) {
-        writer.printf("Received message: %s", msg);
-        writer.println();
-    }
-
-    private final void sendResponse(final ChannelHandlerContext ctx, final String msg) {
-        final ByteBuf                                               buf;
-        final GenericFutureListener<? extends Future<? super Void>> listener;
+        final ByteBuf buf;
 
         log.debug("Sending response", msg, response);
 
+        buf = Unpooled.wrappedBuffer(response.getBytes());
+
+        ctx.writeAndFlush(buf)
+            .addListener(future -> printTransactionContext(msg, future.isSuccess()));
+    }
+
+    /**
+     * Prints to console the transaction context.
+     *
+     * @param request
+     *            request sent by the client
+     * @param successful
+     *            if the response was successful
+     */
+    private final void printTransactionContext(final String request, final Boolean successful) {
+        log.debug("Reply successful: {}", successful);
+
+        // Write context to console
+        writer.println();
+        writer.printf("Received message: %s", request);
+        writer.println();
         writer.printf("Sending response: %s", response);
         writer.println();
 
-        buf = Unpooled.wrappedBuffer(response.getBytes());
-
-        // Reply listener
-        listener = future -> {
-            log.debug("Reply successful: {}", future.isSuccess());
-            if (future.isSuccess()) {
-                writer.println("Successful reply");
-            } else {
-                writer.println("Failed reply");
-            }
-        };
-
-        ctx.writeAndFlush(buf)
-            .addListener(listener);
+        if (successful) {
+            writer.println("Successful response");
+        } else {
+            writer.println("Failed response");
+        }
     }
 
 }
