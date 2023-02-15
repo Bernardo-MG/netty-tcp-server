@@ -30,6 +30,8 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
         final ByteBuf       buf;
         final WriteListener listener;
 
+        log.debug("Received message {} and sending response", msg.getContent(), response);
+
         writer.printf("Received message: %s", msg.getContent());
         writer.println();
 
@@ -40,6 +42,7 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
 
         // Reply listener
         listener = success -> {
+            log.debug("Reply successful: {}", success);
             if (success) {
                 writer.println("Successful reply");
             } else {

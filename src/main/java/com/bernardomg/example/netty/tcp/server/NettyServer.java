@@ -41,6 +41,8 @@ public final class NettyServer implements Server {
 
     @Override
     public final void shutdown() throws Exception {
+        log.debug("Server shutdown");
+
         channelGroup.close();
         bossLoopGroup.shutdownGracefully();
         workerLoopGroup.shutdownGracefully();
@@ -50,6 +52,8 @@ public final class NettyServer implements Server {
     public final void startup() throws Exception {
         final ServerBootstrap bootstrap;
         final ChannelFuture   channelFuture;
+
+        log.debug("Server startup");
 
         bootstrap = new ServerBootstrap();
         bootstrap.group(bossLoopGroup, workerLoopGroup)

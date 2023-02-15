@@ -12,7 +12,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final Integer                              availableProcessors;
@@ -33,6 +35,8 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
     @Override
     protected final void initChannel(final SocketChannel ch) throws Exception {
         final ChannelPipeline pipeline;
+
+        log.debug("Initializing channel");
 
         pipeline = ch.pipeline();
 
