@@ -157,7 +157,7 @@ public final class NettyTcpServer implements Server {
      *
      * @param ctx
      *            channel context
-     * @param rsp
+     * @param msg
      *            response received
      */
     private final void handleRequest(final ChannelHandlerContext ctx, final String msg) {
