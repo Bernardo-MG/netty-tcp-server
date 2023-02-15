@@ -10,7 +10,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class NettyByteToMessageDecoder extends ByteToMessageDecoder {
 
     public NettyByteToMessageDecoder() {
@@ -24,14 +26,19 @@ public final class NettyByteToMessageDecoder extends ByteToMessageDecoder {
         final String  msg;
         final Message message;
 
+        log.debug("Trying to decode response");
+
         readableBytes = in.readableBytes();
         if (readableBytes > 0) {
+            log.debug("Received response");
             msg = in.toString(CharsetUtil.UTF_8);
             in.readerIndex(in.readerIndex() + in.readableBytes());
 
             message = new ImmutableMessage(msg);
 
             out.add(message);
+        } else {
+            log.debug("Received no response");
         }
     }
 

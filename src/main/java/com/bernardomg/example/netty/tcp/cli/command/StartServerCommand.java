@@ -42,7 +42,7 @@ public final class StartServerCommand implements Runnable {
     @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
     private Integer     port;
 
-    @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue="Acknowledged")
+    @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue = "Acknowledged")
     private String      response;
 
     /**
@@ -73,12 +73,12 @@ public final class StartServerCommand implements Runnable {
         writer.println();
         writer.println("------------");
 
-        server = new NettyServer(response, writer);
+        server = new NettyServer(port, response, writer);
 
         try {
             log.debug("Starting server");
-            server.startup(port);
-            log.debug("Stopped server");
+            server.startup();
+            log.debug("Started server");
         } catch (final Exception e) {
             // TODO Auto-generated catch block
             log.error(e.getLocalizedMessage(), e);

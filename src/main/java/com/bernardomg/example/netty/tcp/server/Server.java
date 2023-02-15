@@ -13,11 +13,9 @@ public interface Server {
     /**
      * Startup the TCP server
      *
-     * @param port
-     *            port of the server
      * @throws Exception
      *             if any {@link Exception}
      */
-    public void startup(int port) throws Exception;
+    public void startup() throws Exception;
 
 }
