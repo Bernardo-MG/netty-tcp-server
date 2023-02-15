@@ -56,26 +56,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyTcpServer implements Server {
 
-    private final EventLoopGroup bossLoopGroup   = new NioEventLoopGroup();
+    private EventLoopGroup    bossLoopGroup;
 
-    private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private ChannelGroup      channelGroup;
 
     /**
      * Port which the server will listen to.
      */
-    private final Integer        port;
+    private final Integer     port;
 
     /**
      * Response to send after a request.
      */
-    private final String         response;
+    private final String      response;
 
-    private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
+    private EventLoopGroup    workerLoopGroup;
 
     /**
      * CLI writer, to print console messages.
      */
-    private final PrintWriter    writer;
+    private final PrintWriter writer;
 
     public NettyTcpServer(final Integer prt, final String resp, final PrintWriter writ) {
         super();
@@ -98,7 +98,12 @@ public final class NettyTcpServer implements Server {
         writer.println();
         writer.println("------------");
 
-        // Activate Log4j logger factory
+        // Initializes groups
+        bossLoopGroup = new NioEventLoopGroup();
+        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        workerLoopGroup = new NioEventLoopGroup();
+
+        // Activates Log4j logger factory
         InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
 
         bootstrap = new ServerBootstrap();
