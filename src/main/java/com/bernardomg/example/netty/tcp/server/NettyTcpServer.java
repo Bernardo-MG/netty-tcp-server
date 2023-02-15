@@ -103,7 +103,7 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new ResponseListenerChannelInitializer(this::handleResponse));
+            .childHandler(new ResponseListenerChannelInitializer(this::handleRequest));
 
         try {
             // Binds to the port
@@ -135,14 +135,14 @@ public final class NettyTcpServer implements Server {
     }
 
     /**
-     * Channel response event listener. Will be sent to the response catcher, and will receive any response.
+     * Channel request event listener. Will receive any request sent by the client.
      *
      * @param ctx
      *            channel context
      * @param rsp
      *            response received
      */
-    private final void handleResponse(final ChannelHandlerContext ctx, final String msg) {
+    private final void handleRequest(final ChannelHandlerContext ctx, final String msg) {
         printRequest(msg);
         sendResponse(ctx, msg);
     }
