@@ -21,8 +21,14 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Netty based TCP server.
+ * 
+ * @author bernardo.martinezg
+ *
+ */
 @Slf4j
-public final class NettyServer implements Server {
+public final class NettyTcpServer implements Server {
 
     private final EventLoopGroup bossLoopGroup   = new NioEventLoopGroup();
 
@@ -36,7 +42,7 @@ public final class NettyServer implements Server {
 
     private final PrintWriter    writer;
 
-    public NettyServer(final Integer prt, final String resp, final PrintWriter writ) {
+    public NettyTcpServer(final Integer prt, final String resp, final PrintWriter writ) {
         super();
 
         port = Objects.requireNonNull(prt);
