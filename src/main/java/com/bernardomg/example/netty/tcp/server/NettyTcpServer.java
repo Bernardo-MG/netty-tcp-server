@@ -27,10 +27,13 @@ package com.bernardomg.example.netty.tcp.server;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import com.bernardomg.example.netty.tcp.server.channel.ResponderChannelInitializer;
+import com.bernardomg.example.netty.tcp.server.channel.ResponseListenerChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
@@ -39,6 +42,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
@@ -98,7 +103,7 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new ResponderChannelInitializer(response, writer));
+            .childHandler(new ResponseListenerChannelInitializer(this::handleResponse));
 
         try {
             // Binds to the port
@@ -127,6 +132,49 @@ public final class NettyTcpServer implements Server {
         workerLoopGroup.shutdownGracefully();
 
         log.trace("Stopped server");
+    }
+
+    /**
+     * Channel response event listener. Will be sent to the response catcher, and will receive any response.
+     *
+     * @param ctx
+     *            channel context
+     * @param rsp
+     *            response received
+     */
+    private final void handleResponse(final ChannelHandlerContext ctx, final String msg) {
+        printRequest(msg);
+        sendResponse(ctx, msg);
+    }
+
+    private final void printRequest(final String msg) {
+        writer.printf("Received message: %s", msg);
+        writer.println();
+    }
+
+    private final void sendResponse(final ChannelHandlerContext ctx, final String msg) {
+        final ByteBuf                                               buf;
+        final GenericFutureListener<? extends Future<? super Void>> listener;
+
+        log.debug("Sending response", msg, response);
+
+        writer.printf("Sending response: %s", response);
+        writer.println();
+
+        buf = Unpooled.wrappedBuffer(response.getBytes());
+
+        // Reply listener
+        listener = future -> {
+            log.debug("Reply successful: {}", future.isSuccess());
+            if (future.isSuccess()) {
+                writer.println("Successful reply");
+            } else {
+                writer.println("Failed reply");
+            }
+        };
+
+        ctx.writeAndFlush(buf)
+            .addListener(listener);
     }
 
 }

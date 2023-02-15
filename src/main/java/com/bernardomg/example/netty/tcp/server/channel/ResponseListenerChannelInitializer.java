@@ -24,44 +24,48 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
-import java.io.PrintWriter;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Taps into the channel and prints the message.
+ * Initializes the channel with a response catcher.
  *
  * @author bernardo.martinezg
  *
  */
 @Slf4j
-public final class ChannelMessageTap extends ChannelInboundHandlerAdapter {
+public final class ResponseListenerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final PrintWriter writer;
+    /**
+     * Response listener. This will receive any response from the channel.
+     */
+    private final BiConsumer<ChannelHandlerContext, String> responseListener;
 
-    public ChannelMessageTap(final PrintWriter writ) {
+    public ResponseListenerChannelInitializer(final BiConsumer<ChannelHandlerContext, String> listener) {
         super();
 
-        writer = writ;
+        responseListener = Objects.requireNonNull(listener);
     }
 
     @Override
-    public final void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        log.debug("Received message {}", msg);
+    protected final void initChannel(final SocketChannel ch) throws Exception {
+        final ResponseListenerChannelHandler responseCatcher;
 
-        writer.printf("Received message: %s", msg);
-        writer.println();
+        responseCatcher = new ResponseListenerChannelHandler(responseListener);
 
-        super.channelRead(ctx, msg);
-    }
+        log.debug("Initializing channel");
 
-    @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        ch.pipeline()
+            .addLast("decoder", new StringDecoder())
+            .addLast(responseCatcher);
 
-        log.error(cause.getLocalizedMessage(), cause);
+        log.debug("Initialized channel");
     }
 
 }
