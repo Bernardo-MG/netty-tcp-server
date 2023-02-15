@@ -42,7 +42,7 @@ public final class StartServerCommand implements Runnable {
     @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
     private Integer     port;
 
-    @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue="Acknowledged")
+    @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue = "Acknowledged")
     private String      response;
 
     /**

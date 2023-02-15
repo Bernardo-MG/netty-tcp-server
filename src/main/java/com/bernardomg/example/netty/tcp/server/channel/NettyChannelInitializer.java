@@ -4,32 +4,30 @@ package com.bernardomg.example.netty.tcp.server.channel;
 import java.io.PrintWriter;
 
 import com.bernardomg.example.netty.tcp.server.codec.NettyByteToMessageDecoder;
+import com.bernardomg.example.netty.tcp.server.model.Message;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 
 public final class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final Integer            availableProcessors;
+    private final Integer                              availableProcessors;
 
-    private final EventExecutorGroup executors;
+    private final EventExecutorGroup                   executors;
 
-    private final String             response;
+    private final SimpleChannelInboundHandler<Message> inboundHandler;
 
-    private final PrintWriter        writer;
-
-    public NettyChannelInitializer(final String resp, final PrintWriter writ) {
+    public NettyChannelInitializer(final String response, final PrintWriter writer) {
         super();
-
-        response = resp;
-        writer = writ;
 
         availableProcessors = Runtime.getRuntime()
             .availableProcessors();
         executors = new DefaultEventExecutorGroup(availableProcessors);
+        inboundHandler = new NettySimpleChannelInboundHandler(response, writer);
     }
 
     @Override
@@ -39,8 +37,7 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
         pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new NettyByteToMessageDecoder());
-        pipeline.addLast(executors, "handler", new NettySimpleChannelInboundHandler(response, writer));
-
+        pipeline.addLast(executors, "handler", inboundHandler);
     }
 
 }

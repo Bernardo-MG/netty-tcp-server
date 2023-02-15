@@ -53,6 +53,19 @@ public final class ManifestVersionProvider implements IVersionProvider {
         super();
     }
 
+    /**
+     * Returns the value for the received key.
+     *
+     * @param attributes
+     *            source to get the value
+     * @param key
+     *            key to search for
+     * @return value for the key
+     */
+    private final Object get(final Attributes attributes, final String key) {
+        return attributes.get(new Attributes.Name(key));
+    }
+
     @Override
     public final String[] getVersion() throws Exception {
         final Enumeration<URL> resources = CommandLine.class.getClassLoader()
@@ -91,19 +104,6 @@ public final class ManifestVersionProvider implements IVersionProvider {
         }
 
         return result;
-    }
-
-    /**
-     * Returns the value for the received key.
-     *
-     * @param attributes
-     *            source to get the value
-     * @param key
-     *            key to search for
-     * @return value for the key
-     */
-    private final Object get(final Attributes attributes, final String key) {
-        return attributes.get(new Attributes.Name(key));
     }
 
     /**

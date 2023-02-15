@@ -9,7 +9,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class NettySimpleChannelInboundHandler extends SimpleChannelInboundHandler<Message> {
 
     private final String      response;
@@ -24,13 +26,6 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
     }
 
     @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-
-        cause.printStackTrace();
-    }
-
-    @Override
     protected final void channelRead0(final ChannelHandlerContext ctx, final Message msg) throws Exception {
         final ByteBuf       buf;
         final WriteListener listener;
@@ -40,6 +35,7 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
 
         writer.printf("Sending response: %s", response);
         writer.println();
+
         buf = Unpooled.wrappedBuffer(response.getBytes());
 
         // Reply listener
@@ -55,6 +51,13 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
             .addListener(future -> {
                 listener.messageRespond(future.isSuccess());
             });
+    }
+
+    @Override
+    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+
+        log.error(cause.getLocalizedMessage(), cause);
     }
 
 }
