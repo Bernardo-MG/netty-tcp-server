@@ -52,7 +52,7 @@ public final class ManifestVersionProvider implements IVersionProvider {
     /**
      * Project title. Used to identify the correct manifest.
      */
-    private static final String project = "Netty TCP Server Example";
+    private static final String PROJECT = "Netty TCP Server Example";
 
     /**
      * Default constructor.
@@ -128,7 +128,7 @@ public final class ManifestVersionProvider implements IVersionProvider {
         attributes = manifest.getMainAttributes();
         title = get(attributes, "Implementation-Title");
 
-        return project.equals(title);
+        return PROJECT.equals(title);
     }
 
 }
