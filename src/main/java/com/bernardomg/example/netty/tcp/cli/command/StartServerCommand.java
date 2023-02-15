@@ -24,6 +24,7 @@
 
 package com.bernardomg.example.netty.tcp.cli.command;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
@@ -32,6 +33,7 @@ import com.bernardomg.example.netty.tcp.server.Server;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
@@ -58,6 +60,13 @@ public final class StartServerCommand implements Runnable {
     private CommandSpec spec;
 
     /**
+     * Verbose mode. If active prints info into the console. Active by default.
+     */
+    @Option(names = { "--verbose" }, paramLabel = "VERBOSE", description = "print information to console",
+            defaultValue = "true")
+    private Boolean     verbose;
+
+    /**
      * Default constructor.
      */
     public StartServerCommand() {
@@ -69,8 +78,14 @@ public final class StartServerCommand implements Runnable {
         final PrintWriter writer;
         final Server      server;
 
-        writer = spec.commandLine()
-            .getOut();
+        if (verbose) {
+            // Prints to console
+            writer = spec.commandLine()
+                .getOut();
+        } else {
+            // Prints nothing
+            writer = new PrintWriter(OutputStream.nullOutputStream());
+        }
 
         server = new NettyTcpServer(port, response, writer);
 
