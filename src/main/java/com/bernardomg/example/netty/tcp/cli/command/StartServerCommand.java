@@ -73,11 +73,11 @@ public final class StartServerCommand implements Runnable {
         writer.println();
         writer.println("------------");
 
-        server = new NettyServer(response, writer);
+        server = new NettyServer(port, response, writer);
 
         try {
             log.debug("Starting server");
-            server.startup(port);
+            server.startup();
             log.debug("Stopped server");
         } catch (final Exception e) {
             // TODO Auto-generated catch block

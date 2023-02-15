@@ -23,24 +23,22 @@ public final class NettyServer implements Server {
 
     private final ChannelGroup   channelGroup    = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private final Integer        port;
+
     private final String         response;
 
     private final EventLoopGroup workerLoopGroup = new NioEventLoopGroup();
 
     private final PrintWriter    writer;
 
-    public NettyServer(final String resp, final PrintWriter writ) {
+    public NettyServer(final Integer prt, final String resp, final PrintWriter writ) {
         super();
 
+        port = prt;
         response = resp;
         writer = writ;
     }
 
-    /**
-     * Shutdown the server
-     *
-     * @throws Exception
-     */
     @Override
     public final void shutdown() throws Exception {
         channelGroup.close();
@@ -48,16 +46,8 @@ public final class NettyServer implements Server {
         workerLoopGroup.shutdownGracefully();
     }
 
-    /**
-     * Startup the TCP server
-     *
-     * @param port
-     *            port of the server
-     * @throws Exception
-     *             if any {@link Exception}
-     */
     @Override
-    public final void startup(final int port) throws Exception {
+    public final void startup() throws Exception {
         final ServerBootstrap bootstrap;
         final ChannelFuture   channelFuture;
 
