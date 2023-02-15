@@ -17,31 +17,38 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final Integer                              availableProcessors;
+    private final String      response;
 
-    private final EventExecutorGroup                   executors;
+    private final PrintWriter writer;
 
-    private final SimpleChannelInboundHandler<Message> inboundHandler;
-
-    public NettyChannelInitializer(final String response, final PrintWriter writer) {
+    public NettyChannelInitializer(final String resp, final PrintWriter wrtr) {
         super();
 
-        availableProcessors = Runtime.getRuntime()
-            .availableProcessors();
-        executors = new DefaultEventExecutorGroup(availableProcessors);
-        inboundHandler = new NettySimpleChannelInboundHandler(response, writer);
+        response = resp;
+        writer = wrtr;
     }
 
     @Override
     protected final void initChannel(final SocketChannel ch) throws Exception {
-        final ChannelPipeline pipeline;
+        final ChannelPipeline                      pipeline;
+        final EventExecutorGroup                   executors;
+        final SimpleChannelInboundHandler<Message> inboundHandler;
+        final Integer                              availableProcessors;
 
         log.debug("Initializing channel");
 
         pipeline = ch.pipeline();
 
         pipeline.addLast("decoder", new NettyByteToMessageDecoder());
+
+        availableProcessors = Runtime.getRuntime()
+            .availableProcessors();
+
+        executors = new DefaultEventExecutorGroup(availableProcessors);
+        inboundHandler = new NettySimpleChannelInboundHandler(response, writer);
         pipeline.addLast(executors, "handler", inboundHandler);
+
+        log.debug("Initialized channel");
     }
 
 }
