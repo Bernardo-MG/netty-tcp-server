@@ -18,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public final class NettyResponseChannelHandler extends ChannelInboundHandlerAdapter {
+public final class ResponderChannelHandler extends ChannelInboundHandlerAdapter {
 
     private final String      response;
 
     private final PrintWriter writer;
 
-    public NettyResponseChannelHandler(final String resp, final PrintWriter writ) {
+    public ResponderChannelHandler(final String resp, final PrintWriter writ) {
         super();
 
         response = resp;

@@ -2,7 +2,7 @@
 package com.bernardomg.example.netty.tcp.server;
 
 /**
- * Represents a server, and allows starting and stopping it.
+ * Generic server. Supports starting and stopping it.
  *
  * @author bernardo.martinezg
  *

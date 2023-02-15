@@ -12,13 +12,13 @@ import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
+public final class ResponderChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final String      response;
 
     private final PrintWriter writer;
 
-    public NettyChannelInitializer(final String resp, final PrintWriter wrtr) {
+    public ResponderChannelInitializer(final String resp, final PrintWriter wrtr) {
         super();
 
         response = resp;
@@ -41,7 +41,7 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
         executors = new DefaultEventExecutorGroup(availableProcessors);
 
         pipeline.addLast("decoder", new StringDecoder())
-            .addLast(executors, new NettyChannelMessageTap(writer), new NettyResponseChannelHandler(response, writer));
+            .addLast(executors, new ChannelMessageTap(writer), new ResponderChannelHandler(response, writer));
 
         log.debug("Initialized channel");
     }

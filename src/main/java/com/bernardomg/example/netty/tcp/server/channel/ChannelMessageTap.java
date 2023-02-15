@@ -14,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public final class NettyChannelMessageTap extends ChannelInboundHandlerAdapter {
+public final class ChannelMessageTap extends ChannelInboundHandlerAdapter {
 
     private final PrintWriter writer;
 
-    public NettyChannelMessageTap(final PrintWriter writ) {
+    public ChannelMessageTap(final PrintWriter writ) {
         super();
 
         writer = writ;
