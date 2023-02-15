@@ -3,7 +3,6 @@ package com.bernardomg.example.netty.tcp.server.channel;
 
 import java.io.PrintWriter;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -30,21 +29,19 @@ public final class NettyChannelInitializer extends ChannelInitializer<SocketChan
     protected final void initChannel(final SocketChannel ch) throws Exception {
         final ChannelPipeline    pipeline;
         final EventExecutorGroup executors;
-        final ChannelHandler     inboundHandler;
         final Integer            availableProcessors;
 
         log.debug("Initializing channel");
 
         pipeline = ch.pipeline();
 
-        pipeline.addLast("decoder", new StringDecoder());
-
         availableProcessors = Runtime.getRuntime()
             .availableProcessors();
 
         executors = new DefaultEventExecutorGroup(availableProcessors);
-        inboundHandler = new NettyChannelInboundHandler(response, writer);
-        pipeline.addLast(executors, "handler", inboundHandler);
+
+        pipeline.addLast("decoder", new StringDecoder())
+            .addLast(executors, new NettyChannelMessageTap(writer), new NettyResponseChannelHandler(response, writer));
 
         log.debug("Initialized channel");
     }

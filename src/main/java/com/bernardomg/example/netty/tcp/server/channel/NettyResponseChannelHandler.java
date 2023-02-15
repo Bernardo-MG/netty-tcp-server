@@ -11,14 +11,20 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Sends a response through the channel.
+ *
+ * @author bernardo.martinezg
+ *
+ */
 @Slf4j
-public final class NettyChannelInboundHandler extends ChannelInboundHandlerAdapter {
+public final class NettyResponseChannelHandler extends ChannelInboundHandlerAdapter {
 
     private final String      response;
 
     private final PrintWriter writer;
 
-    public NettyChannelInboundHandler(final String resp, final PrintWriter writ) {
+    public NettyResponseChannelHandler(final String resp, final PrintWriter writ) {
         super();
 
         response = resp;
@@ -26,14 +32,11 @@ public final class NettyChannelInboundHandler extends ChannelInboundHandlerAdapt
     }
 
     @Override
-    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+    public final void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         final ByteBuf                                               buf;
         final GenericFutureListener<? extends Future<? super Void>> listener;
 
-        log.debug("Received message {} and sending response", msg, response);
-
-        writer.printf("Received message: %s", msg);
-        writer.println();
+        log.debug("Sending response", msg, response);
 
         writer.printf("Sending response: %s", response);
         writer.println();
@@ -52,6 +55,8 @@ public final class NettyChannelInboundHandler extends ChannelInboundHandlerAdapt
 
         ctx.writeAndFlush(buf)
             .addListener(listener);
+
+        super.channelRead(ctx, msg);
     }
 
     @Override
