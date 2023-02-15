@@ -11,16 +11,11 @@ public interface Server {
 
     /**
      * Starts the server.
-     *
-     * @throws Exception
-     *             if any {@link Exception}
      */
     public void start();
 
     /**
      * Stops the server.
-     *
-     * @throws Exception
      */
     public void stop();
 
