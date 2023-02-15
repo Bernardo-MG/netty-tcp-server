@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Netty based TCP server.
- * 
+ *
  * @author bernardo.martinezg
  *
  */

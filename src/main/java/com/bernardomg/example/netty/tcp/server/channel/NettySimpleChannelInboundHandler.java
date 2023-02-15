@@ -3,16 +3,14 @@ package com.bernardomg.example.netty.tcp.server.channel;
 
 import java.io.PrintWriter;
 
-import com.bernardomg.example.netty.tcp.server.model.Message;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class NettySimpleChannelInboundHandler extends SimpleChannelInboundHandler<Message> {
+public final class NettySimpleChannelInboundHandler extends ChannelInboundHandlerAdapter {
 
     private final String      response;
 
@@ -26,13 +24,13 @@ public final class NettySimpleChannelInboundHandler extends SimpleChannelInbound
     }
 
     @Override
-    protected final void channelRead0(final ChannelHandlerContext ctx, final Message msg) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         final ByteBuf       buf;
         final WriteListener listener;
 
-        log.debug("Received message {} and sending response", msg.getContent(), response);
+        log.debug("Received message {} and sending response", msg, response);
 
-        writer.printf("Received message: %s", msg.getContent());
+        writer.printf("Received message: %s", msg);
         writer.println();
 
         writer.printf("Sending response: %s", response);
