@@ -140,6 +140,11 @@ public final class NettyTcpServer implements Server {
     public final void stop() {
         log.trace("Stopping server");
 
+        writer.println();
+        writer.println("------------");
+        writer.println("Stopping server");
+        writer.println("------------");
+
         channelGroup.close();
         bossLoopGroup.shutdownGracefully();
         workerLoopGroup.shutdownGracefully();
