@@ -21,29 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package com.bernardomg.example.netty.tcp.cli;
-
-import com.bernardomg.example.netty.tcp.cli.command.StartServerCommand;
-import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
-
-import picocli.CommandLine.Command;
-
 /**
- * Dice roller menu.
- *
- * @author Bernardo Mart&iacute;nez Garrido
- *
+ * Channel components.
  */
-@Command(description = "TCP server", subcommands = { StartServerCommand.class }, mixinStandardHelpOptions = true,
-        versionProvider = ManifestVersionProvider.class)
-public class TcpServerMenu {
 
-    /**
-     * Default constructor.
-     */
-    public TcpServerMenu() {
-        super();
-    }
-
-}
+package com.bernardomg.example.netty.tcp.server.channel;
