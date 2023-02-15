@@ -78,7 +78,7 @@ public final class StartServerCommand implements Runnable {
         try {
             log.debug("Starting server");
             server.startup();
-            log.debug("Stopped server");
+            log.debug("Started server");
         } catch (final Exception e) {
             // TODO Auto-generated catch block
             log.error(e.getLocalizedMessage(), e);
