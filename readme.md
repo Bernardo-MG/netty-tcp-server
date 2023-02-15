@@ -76,7 +76,6 @@ If you wish to fork or modify the code, visit the [GitHub project page][scm], wh
 
 The project has been released under the [MIT License][license].
 
-[maven-repo]: https://mvnrepository.com/artifact/com.bernardomg.example/netty-tcp-server
 [issues]: https://github.com/bernardo-mg/netty-tcp-server/issues
 [javadoc-develop]: https://docs.bernardomg.com/development/maven/netty-tcp-server/apidocs
 [javadoc-release]: https://docs.bernardomg.com/maven/netty-tcp-server/apidocs
