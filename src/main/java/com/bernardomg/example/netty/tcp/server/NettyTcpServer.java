@@ -61,14 +61,14 @@ public final class NettyTcpServer implements Server {
     private final ServerListener listener;
 
     /**
+     * Response to send after a request.
+     */
+    private final String         messageForClient;
+
+    /**
      * Port which the server will listen to.
      */
     private final Integer        port;
-
-    /**
-     * Response to send after a request.
-     */
-    private final String         response;
 
     private EventLoopGroup       workerLoopGroup;
 
@@ -76,7 +76,7 @@ public final class NettyTcpServer implements Server {
         super();
 
         port = Objects.requireNonNull(prt);
-        response = Objects.requireNonNull(resp);
+        messageForClient = Objects.requireNonNull(resp);
         listener = Objects.requireNonNull(lst);
     }
 
@@ -150,14 +150,14 @@ public final class NettyTcpServer implements Server {
      * @param ctx
      *            channel context
      * @param request
-     *            request received
+     *            received request body
      */
     private final void handleRequest(final ChannelHandlerContext ctx, final String request) {
         final ByteBuf buf;
 
         log.debug("Sending response");
 
-        buf = Unpooled.wrappedBuffer(response.getBytes());
+        buf = Unpooled.wrappedBuffer(messageForClient.getBytes());
 
         ctx.writeAndFlush(buf)
             .addListener(future -> {
@@ -165,7 +165,7 @@ public final class NettyTcpServer implements Server {
 
                 success = future.isSuccess();
                 log.debug("Reply successful: {}", success);
-                listener.onTransaction(request, response, success);
+                listener.onTransaction(request, messageForClient, success);
             });
     }
 
