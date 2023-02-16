@@ -55,6 +55,9 @@ public final class NettyTcpServer implements Server {
 
     private ChannelGroup         channelGroup;
 
+    /**
+     * Server listener. Extension hook which allows reacting to the server events.
+     */
     private final ServerListener listener;
 
     /**
@@ -142,7 +145,7 @@ public final class NettyTcpServer implements Server {
     }
 
     /**
-     * Channel request event listener. Will receive any request sent by the client.
+     * Request event internal listener. Will receive any request sent by the client.
      *
      * @param ctx
      *            channel context
