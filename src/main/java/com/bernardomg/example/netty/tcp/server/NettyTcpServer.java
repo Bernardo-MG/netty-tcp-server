@@ -24,7 +24,6 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
-import java.io.PrintWriter;
 import java.util.Objects;
 
 import com.bernardomg.example.netty.tcp.server.channel.ResponseListenerChannelInitializer;
@@ -52,33 +51,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyTcpServer implements Server {
 
-    private EventLoopGroup    bossLoopGroup;
+    private EventLoopGroup       bossLoopGroup;
 
-    private ChannelGroup      channelGroup;
+    private ChannelGroup         channelGroup;
+
+    private final ServerListener listener;
 
     /**
      * Port which the server will listen to.
      */
-    private final Integer     port;
+    private final Integer        port;
 
     /**
      * Response to send after a request.
      */
-    private final String      response;
+    private final String         response;
 
-    private EventLoopGroup    workerLoopGroup;
+    private EventLoopGroup       workerLoopGroup;
 
-    /**
-     * CLI writer, to print console messages.
-     */
-    private final PrintWriter writer;
-
-    public NettyTcpServer(final Integer prt, final String resp, final PrintWriter writ) {
+    public NettyTcpServer(final Integer prt, final String resp, final ServerListener lst) {
         super();
 
         port = Objects.requireNonNull(prt);
         response = Objects.requireNonNull(resp);
-        writer = Objects.requireNonNull(writ);
+        listener = Objects.requireNonNull(lst);
     }
 
     @Override
@@ -88,11 +84,7 @@ public final class NettyTcpServer implements Server {
 
         log.trace("Starting server");
 
-        writer.println();
-        writer.println("------------");
-        writer.printf("Starting server and listening to port %d", port);
-        writer.println();
-        writer.println("------------");
+        listener.onStart();
 
         // Initializes groups
         bossLoopGroup = new NioEventLoopGroup();
@@ -140,10 +132,7 @@ public final class NettyTcpServer implements Server {
     public final void stop() {
         log.trace("Stopping server");
 
-        writer.println();
-        writer.println("------------");
-        writer.println("Stopping server");
-        writer.println("------------");
+        listener.onStop();
 
         channelGroup.close();
         bossLoopGroup.shutdownGracefully();
@@ -168,32 +157,13 @@ public final class NettyTcpServer implements Server {
         buf = Unpooled.wrappedBuffer(response.getBytes());
 
         ctx.writeAndFlush(buf)
-            .addListener(future -> printTransactionContext(msg, future.isSuccess()));
-    }
+            .addListener(future -> {
+                final Boolean success;
 
-    /**
-     * Prints to console the transaction context.
-     *
-     * @param request
-     *            request sent by the client
-     * @param successful
-     *            if the response was successful
-     */
-    private final void printTransactionContext(final String request, final Boolean successful) {
-        log.debug("Reply successful: {}", successful);
-
-        // Write context to console
-        writer.println();
-        writer.printf("Received message: %s", request);
-        writer.println();
-        writer.printf("Sending response: %s", response);
-        writer.println();
-
-        if (successful) {
-            writer.println("Successful response");
-        } else {
-            writer.println("Failed response");
-        }
+                success = future.isSuccess();
+                log.debug("Reply successful: {}", success);
+                listener.onTransaction(msg, response, success);
+            });
     }
 
 }
