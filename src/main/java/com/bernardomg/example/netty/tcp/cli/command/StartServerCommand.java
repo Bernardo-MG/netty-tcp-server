@@ -1,42 +1,52 @@
 /**
- * Copyright 2020-2022 the original author or authors
+ * The MIT License (MIT)
  * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Copyright (c) 2023 the original author or authors.
  * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.bernardomg.example.netty.tcp.cli.command;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import com.bernardomg.example.netty.tcp.cli.CliWriterClientListener;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
-import com.bernardomg.example.netty.tcp.server.NettyServer;
+import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
 import com.bernardomg.example.netty.tcp.server.Server;
+import com.bernardomg.example.netty.tcp.server.ServerListener;
 
-import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
 /**
- * Dice gatherer command. Receives an expression, gets all the dice sets on it and prints the result on screen.
+ * Start server command.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Command(name = "start", description = "Starts a TCP server", mixinStandardHelpOptions = true,
         versionProvider = ManifestVersionProvider.class)
-@Slf4j
 public final class StartServerCommand implements Runnable {
 
     @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
@@ -52,6 +62,13 @@ public final class StartServerCommand implements Runnable {
     private CommandSpec spec;
 
     /**
+     * Verbose mode. If active prints info into the console. Active by default.
+     */
+    @Option(names = { "--verbose" }, paramLabel = "VERBOSE", description = "print information to console",
+            defaultValue = "true")
+    private Boolean     verbose;
+
+    /**
      * Default constructor.
      */
     public StartServerCommand() {
@@ -60,30 +77,23 @@ public final class StartServerCommand implements Runnable {
 
     @Override
     public final void run() {
-        final PrintWriter writer;
-        final Server      server;
+        final PrintWriter    writer;
+        final Server         server;
+        final ServerListener listener;
 
-        writer = spec.commandLine()
-            .getOut();
-
-        // Prints the final result
-        writer.println();
-        writer.println("------------");
-        writer.printf("Starting server and listening to port %d", port);
-        writer.println();
-        writer.println("------------");
-
-        server = new NettyServer(port, response, writer);
-
-        try {
-            log.debug("Starting server");
-            server.startup();
-            log.debug("Started server");
-        } catch (final Exception e) {
-            // TODO Auto-generated catch block
-            log.error(e.getLocalizedMessage(), e);
-            e.printStackTrace();
+        if (verbose) {
+            // Prints to console
+            writer = spec.commandLine()
+                .getOut();
+        } else {
+            // Prints nothing
+            writer = new PrintWriter(OutputStream.nullOutputStream());
         }
+
+        listener = new CliWriterClientListener(port, writer);
+        server = new NettyTcpServer(port, response, listener);
+
+        server.start();
     }
 
 }

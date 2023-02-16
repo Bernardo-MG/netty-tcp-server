@@ -1,23 +1,23 @@
-# Project Index
+# Netty TCP Client Example
 
-This is a base project created with the [Library Maven Archetype][library-archetype], prepared to ease the development of new libraries.
+This is a basic Maven-based Java project created with the use of the [Library Maven Archetype](https://github.com/Bernardo-MG/library-maven-archetype). It will ease the development of new libraries, setting it up for CI through the use of free services: [Github](https://github.com/), [Github Workflow](https://docs.github.com/en/actions/configuring-and-managing-workflows), [Github Packages](https://github.com/features/packages) and [OSS Sonatype](https://oss.sonatype.org/).
 
-Note that while it is meant to be a working project from the beginning, meaning that it compiles, runs the tests and creates the docs. It is mostly composed of placeholder classes which should be swapped with actual content.
+To use the project first package it:
 
-## Where should I start customizing the project?
+```
+mvn clean package
+```
 
-First of all, check the [Library Maven Archetype][library-archetype] documentation, and then edit the readme file and the Maven site descriptions about the project.
+The JAR will be a runnable Java file. It can be executed like this:
 
-After that, of course, the classes and tests included should be replaced with actual code, which also means adding dependencies and changing profiles and plugins as needed on the POM.
+```
+java -jar target/client.jar message 127.0.0.1 8080 Hello
+```
 
-## Some external requirements
+To show other commands:
 
-While the project can be used just by itself, it won't take full advantage of most of the configuration until it is integrated with a few services:
+```
+java -jar target/client.jar -h
+```
 
-- Version control system, Github by default.
-- Continuous integration, Github Workflow by default.
-- Releases repository. OSSRH Sonatype and Github packages.
-- Test artifacts repository, Sonatype OSS by default.
-- Documentation repository, through FTP or SSH.
-
-[library-archetype]: https://github.com/Bernardo-MG/library-maven-archetype
+You can use this project along the [Netty TCP Server Example](https://github.com/Bernardo-MG/netty-tcp-server-example) to experiment with TCP communications between a client and a server.

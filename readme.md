@@ -20,6 +20,8 @@ To show other commands:
 java -jar target/server.jar -h
 ```
 
+You can use this project along the [Netty TCP Client Example](https://github.com/Bernardo-MG/netty-tcp-client-example) to experiment with TCP communications between a client and a server.
+
 [![Release docs](https://img.shields.io/badge/docs-release-blue.svg)][site-release]
 [![Development docs](https://img.shields.io/badge/docs-develop-blue.svg)][site-develop]
 

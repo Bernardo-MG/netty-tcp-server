@@ -22,6 +22,11 @@
          <AppenderRef ref="console" />
       </Logger>
 
+      <!-- Netty -->
+      <Logger name="io.netty" level="error" additivity="false">
+         <AppenderRef ref="console"/>
+      </Logger>
+
       <Root level="error">
          <AppenderRef ref="console" />
       </Root>

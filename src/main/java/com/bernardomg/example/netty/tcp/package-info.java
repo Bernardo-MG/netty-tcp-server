@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 /**
- * Provides placeholder classes.
+ * Project root package. Contains the executable class.
  */
 
 package com.bernardomg.example.netty.tcp;

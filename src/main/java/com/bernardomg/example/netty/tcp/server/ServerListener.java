@@ -22,28 +22,36 @@
  * SOFTWARE.
  */
 
-package com.bernardomg.example.netty.tcp.cli;
-
-import com.bernardomg.example.netty.tcp.cli.command.StartServerCommand;
-import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
-
-import picocli.CommandLine.Command;
+package com.bernardomg.example.netty.tcp.server;
 
 /**
- * Dice roller menu.
+ * Server listener. Allows reacting to events related to the server.
  *
- * @author Bernardo Mart&iacute;nez Garrido
+ * @author Bernardo
  *
  */
-@Command(description = "TCP server", subcommands = { StartServerCommand.class }, mixinStandardHelpOptions = true,
-        versionProvider = ManifestVersionProvider.class)
-public class TcpServerMenu {
+public interface ServerListener {
 
     /**
-     * Default constructor.
+     * Reacts to the server starting;
      */
-    public TcpServerMenu() {
-        super();
-    }
+    public void onStart();
+
+    /**
+     * Reacts to the server stopping;
+     */
+    public void onStop();
+
+    /**
+     * Reacts to the server finishing a transaction.
+     *
+     * @param request
+     *            client request
+     * @param response
+     *            server response
+     * @param success
+     *            success status
+     */
+    public void onTransaction(final String request, final String response, final Boolean success);
 
 }
