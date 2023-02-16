@@ -146,13 +146,13 @@ public final class NettyTcpServer implements Server {
      *
      * @param ctx
      *            channel context
-     * @param msg
-     *            response received
+     * @param request
+     *            request received
      */
-    private final void handleRequest(final ChannelHandlerContext ctx, final String msg) {
+    private final void handleRequest(final ChannelHandlerContext ctx, final String request) {
         final ByteBuf buf;
 
-        log.debug("Sending response", msg, response);
+        log.debug("Sending response");
 
         buf = Unpooled.wrappedBuffer(response.getBytes());
 
@@ -162,7 +162,7 @@ public final class NettyTcpServer implements Server {
 
                 success = future.isSuccess();
                 log.debug("Reply successful: {}", success);
-                listener.onTransaction(msg, response, success);
+                listener.onTransaction(request, response, success);
             });
     }
 
