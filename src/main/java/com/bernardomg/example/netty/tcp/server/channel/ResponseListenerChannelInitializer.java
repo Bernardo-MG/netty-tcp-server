@@ -34,7 +34,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initializes the channel with a response catcher.
+ * Initializes the channel with a response listener.
  *
  * @author bernardo.martinezg
  *
@@ -55,15 +55,15 @@ public final class ResponseListenerChannelInitializer extends ChannelInitializer
 
     @Override
     protected final void initChannel(final SocketChannel ch) throws Exception {
-        final ResponseListenerChannelHandler responseCatcher;
+        final ResponseListenerChannelHandler listenerHandler;
 
-        responseCatcher = new ResponseListenerChannelHandler(responseListener);
+        listenerHandler = new ResponseListenerChannelHandler(responseListener);
 
         log.debug("Initializing channel");
 
         ch.pipeline()
             .addLast("decoder", new StringDecoder())
-            .addLast(responseCatcher);
+            .addLast(listenerHandler);
 
         log.debug("Initialized channel");
     }
