@@ -94,8 +94,7 @@ public final class NettyTcpServer implements Server {
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
         workerLoopGroup = new NioEventLoopGroup();
 
-        bootstrap = new ServerBootstrap();
-        bootstrap
+        bootstrap = new ServerBootstrap()
             // Registers groups
             .group(bossLoopGroup, workerLoopGroup)
             // Defines channel
@@ -155,7 +154,7 @@ public final class NettyTcpServer implements Server {
     private final void handleRequest(final ChannelHandlerContext ctx, final String request) {
         final ByteBuf buf;
 
-        log.debug("Sending response");
+        log.debug("Handling request");
 
         buf = Unpooled.wrappedBuffer(messageForClient.getBytes());
 
