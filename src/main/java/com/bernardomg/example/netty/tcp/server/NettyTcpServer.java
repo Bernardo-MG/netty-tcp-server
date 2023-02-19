@@ -51,28 +51,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyTcpServer implements Server {
 
-    private EventLoopGroup       bossLoopGroup;
+    private EventLoopGroup            bossLoopGroup;
 
-    private ChannelGroup         channelGroup;
+    private ChannelGroup              channelGroup;
 
     /**
      * Server listener. Extension hook which allows reacting to the server events.
      */
-    private final ServerListener listener;
+    private final TransactionListener listener;
 
     /**
      * Response to send after a request.
      */
-    private final String         messageForClient;
+    private final String              messageForClient;
 
     /**
      * Port which the server will listen to.
      */
-    private final Integer        port;
+    private final Integer             port;
 
-    private EventLoopGroup       workerLoopGroup;
+    private EventLoopGroup            workerLoopGroup;
 
-    public NettyTcpServer(final Integer prt, final String resp, final ServerListener lst) {
+    public NettyTcpServer(final Integer prt, final String resp, final TransactionListener lst) {
         super();
 
         port = Objects.requireNonNull(prt);
@@ -156,15 +156,22 @@ public final class NettyTcpServer implements Server {
 
         log.debug("Handling request");
 
+        log.debug("Received request: {}", request);
+
+        listener.onReceive(request);
+
         buf = Unpooled.wrappedBuffer(messageForClient.getBytes());
 
         ctx.writeAndFlush(buf)
             .addListener(future -> {
                 final Boolean success;
 
+                log.debug("Sending response: {}", messageForClient);
+
+                listener.onSend(messageForClient);
+
                 success = future.isSuccess();
                 log.debug("Reply successful: {}", success);
-                listener.onTransaction(request, messageForClient, success);
             });
     }
 
