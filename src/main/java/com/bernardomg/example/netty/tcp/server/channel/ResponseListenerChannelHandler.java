@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Response listener channel handler. Will send any message to the contained listener.
  *
- * @author bernardo.martinezg
+ * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j

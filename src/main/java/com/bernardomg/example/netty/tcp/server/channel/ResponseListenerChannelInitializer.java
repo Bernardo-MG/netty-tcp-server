@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Initializes the channel with a response listener.
  *
- * @author bernardo.martinezg
+ * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
