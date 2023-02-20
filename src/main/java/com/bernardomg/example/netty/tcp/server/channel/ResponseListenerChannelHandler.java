@@ -58,11 +58,6 @@ public final class ResponseListenerChannelHandler extends SimpleChannelInboundHa
     }
 
     @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-    }
-
-    @Override
     protected final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
         log.debug("Received message {}", message);
 

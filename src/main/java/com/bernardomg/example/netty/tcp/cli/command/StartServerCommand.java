@@ -77,8 +77,8 @@ public final class StartServerCommand implements Runnable {
 
     @Override
     public final void run() {
-        final PrintWriter    writer;
-        final Server         server;
+        final PrintWriter         writer;
+        final Server              server;
         final TransactionListener listener;
 
         if (verbose) {
