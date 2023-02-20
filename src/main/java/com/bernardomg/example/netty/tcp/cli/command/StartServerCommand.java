@@ -27,11 +27,11 @@ package com.bernardomg.example.netty.tcp.cli.command;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import com.bernardomg.example.netty.tcp.cli.CliWriterClientListener;
+import com.bernardomg.example.netty.tcp.cli.CliWriterTransactionListener;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
 import com.bernardomg.example.netty.tcp.server.Server;
-import com.bernardomg.example.netty.tcp.server.ServerListener;
+import com.bernardomg.example.netty.tcp.server.TransactionListener;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -79,7 +79,7 @@ public final class StartServerCommand implements Runnable {
     public final void run() {
         final PrintWriter    writer;
         final Server         server;
-        final ServerListener listener;
+        final TransactionListener listener;
 
         if (verbose) {
             // Prints to console
@@ -90,7 +90,7 @@ public final class StartServerCommand implements Runnable {
             writer = new PrintWriter(OutputStream.nullOutputStream());
         }
 
-        listener = new CliWriterClientListener(port, writer);
+        listener = new CliWriterTransactionListener(port, writer);
         server = new NettyTcpServer(port, response, listener);
 
         server.start();

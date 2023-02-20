@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Response listener channel handler. Will send any message to the contained listener.
  *
- * @author bernardo.martinezg
+ * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
@@ -58,15 +58,15 @@ public final class ResponseListenerChannelHandler extends SimpleChannelInboundHa
     }
 
     @Override
-    public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
-        log.debug("Received message {}", message);
-
-        responseListener.accept(ctx, message);
+    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
     }
 
     @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+    protected final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
+        log.debug("Received message {}", message);
+
+        responseListener.accept(ctx, message);
     }
 
 }

@@ -45,38 +45,38 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Netty based TCP server.
  *
- * @author bernardo.martinezg
+ * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
 public final class NettyTcpServer implements Server {
 
-    private EventLoopGroup       bossLoopGroup;
+    private EventLoopGroup            bossLoopGroup;
 
-    private ChannelGroup         channelGroup;
+    private ChannelGroup              channelGroup;
 
     /**
      * Server listener. Extension hook which allows reacting to the server events.
      */
-    private final ServerListener listener;
-
-    /**
-     * Port which the server will listen to.
-     */
-    private final Integer        port;
+    private final TransactionListener listener;
 
     /**
      * Response to send after a request.
      */
-    private final String         response;
+    private final String              messageForClient;
 
-    private EventLoopGroup       workerLoopGroup;
+    /**
+     * Port which the server will listen to.
+     */
+    private final Integer             port;
 
-    public NettyTcpServer(final Integer prt, final String resp, final ServerListener lst) {
+    private EventLoopGroup            workerLoopGroup;
+
+    public NettyTcpServer(final Integer prt, final String resp, final TransactionListener lst) {
         super();
 
         port = Objects.requireNonNull(prt);
-        response = Objects.requireNonNull(resp);
+        messageForClient = Objects.requireNonNull(resp);
         listener = Objects.requireNonNull(lst);
     }
 
@@ -94,8 +94,7 @@ public final class NettyTcpServer implements Server {
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
         workerLoopGroup = new NioEventLoopGroup();
 
-        bootstrap = new ServerBootstrap();
-        bootstrap
+        bootstrap = new ServerBootstrap()
             // Registers groups
             .group(bossLoopGroup, workerLoopGroup)
             // Defines channel
@@ -150,22 +149,29 @@ public final class NettyTcpServer implements Server {
      * @param ctx
      *            channel context
      * @param request
-     *            request received
+     *            received request body
      */
     private final void handleRequest(final ChannelHandlerContext ctx, final String request) {
         final ByteBuf buf;
 
-        log.debug("Sending response");
+        log.debug("Handling request");
 
-        buf = Unpooled.wrappedBuffer(response.getBytes());
+        log.debug("Received request: {}", request);
+
+        listener.onReceive(request);
+
+        buf = Unpooled.wrappedBuffer(messageForClient.getBytes());
 
         ctx.writeAndFlush(buf)
             .addListener(future -> {
                 final Boolean success;
 
+                log.debug("Sending response: {}", messageForClient);
+
+                listener.onSend(messageForClient);
+
                 success = future.isSuccess();
                 log.debug("Reply successful: {}", success);
-                listener.onTransaction(request, response, success);
             });
     }
 
