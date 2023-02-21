@@ -58,40 +58,10 @@ public final class MessageListenerChannelHandler extends SimpleChannelInboundHan
     }
 
     @Override
-    public final void channelActive(final ChannelHandlerContext ctx) {
-        log.debug("Channel active");
-    }
-
-    @Override
-    public final void channelInactive(final ChannelHandlerContext ctx) {
-        log.debug("Channel inactive");
-    }
-
-    @Override
     public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
         log.debug("Received message {}", message);
 
         listener.accept(ctx, message);
-    }
-
-    @Override
-    public final void channelReadComplete(final ChannelHandlerContext ctx) throws Exception {
-        log.debug("Channel read complete");
-    }
-
-    @Override
-    public final void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
-        log.debug("Channel registered");
-    }
-
-    @Override
-    public final void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
-        log.debug("Channel unregistered");
-    }
-
-    @Override
-    public final void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
-        log.debug("User event triggered");
     }
 
 }

@@ -24,54 +24,56 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
-import java.util.Objects;
-import java.util.function.BiConsumer;
-
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initializes the channel with a message listener. Any message received by the channel will be sent to the listener.
+ * Event logger adapter. Will log each event.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class MessageListenerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public final class EventLoggerChannelHandler extends ChannelInboundHandlerAdapter {
 
-    /**
-     * Message listener. This will receive any response from the channel.
-     */
-    private final BiConsumer<ChannelHandlerContext, String> listener;
-
-    public MessageListenerChannelInitializer(final BiConsumer<ChannelHandlerContext, String> lstn) {
+    public EventLoggerChannelHandler() {
         super();
-
-        listener = Objects.requireNonNull(lstn);
     }
 
     @Override
-    protected final void initChannel(final SocketChannel ch) throws Exception {
-        final MessageListenerChannelHandler listenerHandler;
+    public final void channelActive(final ChannelHandlerContext ctx) {
+        log.debug("Channel active");
+    }
 
-        // Message listener handler
-        // Sends any message received by the channel to the listener
-        listenerHandler = new MessageListenerChannelHandler(listener);
+    @Override
+    public final void channelInactive(final ChannelHandlerContext ctx) {
+        log.debug("Channel inactive");
+    }
 
-        log.debug("Initializing channel");
+    @Override
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        log.debug("Channel read");
+    }
 
-        ch.pipeline()
-            // Transforms message into a string
-            .addLast("decoder", new StringDecoder())
-            // Adds listener handler
-            .addLast(listenerHandler)
-            // Adds event logger
-            .addLast(new EventLoggerChannelHandler());
+    @Override
+    public final void channelReadComplete(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel read complete");
+    }
 
-        log.debug("Initialized channel");
+    @Override
+    public final void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel registered");
+    }
+
+    @Override
+    public final void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel unregistered");
+    }
+
+    @Override
+    public final void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
+        log.debug("User event triggered");
     }
 
 }
