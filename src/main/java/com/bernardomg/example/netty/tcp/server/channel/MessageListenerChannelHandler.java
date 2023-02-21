@@ -74,4 +74,24 @@ public final class MessageListenerChannelHandler extends SimpleChannelInboundHan
         listener.accept(ctx, message);
     }
 
+    @Override
+    public final void channelReadComplete(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel read complete");
+    }
+
+    @Override
+    public final void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel registered");
+    }
+
+    @Override
+    public final void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel unregistered");
+    }
+
+    @Override
+    public final void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
+        log.debug("User event triggered");
+    }
+
 }
