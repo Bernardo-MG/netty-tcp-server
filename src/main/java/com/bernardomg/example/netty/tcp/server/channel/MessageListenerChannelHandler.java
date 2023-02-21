@@ -32,36 +32,36 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Response listener channel handler. Will send any message to the contained listener.
+ * Message listener channel handler. Will send any message to the contained listener.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class ResponseListenerChannelHandler extends SimpleChannelInboundHandler<String> {
+public final class MessageListenerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     /**
-     * Response listener. This will receive any response from the channel.
+     * Channel listener. This will receive any message from the channel.
      */
-    private final BiConsumer<ChannelHandlerContext, String> responseListener;
+    private final BiConsumer<ChannelHandlerContext, String> listener;
 
     /**
-     * Constructs a channel handler which will send any response to the listener.
+     * Constructs a channel handler which will send any message to the listener.
      *
-     * @param listener
-     *            Listener to watch for channel responses
+     * @param lstn
+     *            listener to watch for channel messages
      */
-    public ResponseListenerChannelHandler(final BiConsumer<ChannelHandlerContext, String> listener) {
+    public MessageListenerChannelHandler(final BiConsumer<ChannelHandlerContext, String> lstn) {
         super();
 
-        responseListener = Objects.requireNonNull(listener);
+        listener = Objects.requireNonNull(lstn);
     }
 
     @Override
     protected final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
         log.debug("Received message {}", message);
 
-        responseListener.accept(ctx, message);
+        listener.accept(ctx, message);
     }
 
 }

@@ -26,7 +26,7 @@ package com.bernardomg.example.netty.tcp.server;
 
 import java.util.Objects;
 
-import com.bernardomg.example.netty.tcp.server.channel.ResponseListenerChannelInitializer;
+import com.bernardomg.example.netty.tcp.server.channel.MessageListenerChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -106,7 +106,7 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new ResponseListenerChannelInitializer(this::handleRequest));
+            .childHandler(new MessageListenerChannelInitializer(this::handleRequest));
 
         try {
             // Binds to the port
