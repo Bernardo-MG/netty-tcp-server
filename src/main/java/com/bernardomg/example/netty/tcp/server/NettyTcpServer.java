@@ -110,7 +110,7 @@ public final class NettyTcpServer implements Server {
 
         try {
             // Binds to the port
-            log.debug("Binding port {}", port);
+            log.debug("Binding to port {}", port);
             channelFuture = bootstrap.bind(port)
                 .sync();
         } catch (final InterruptedException e) {
