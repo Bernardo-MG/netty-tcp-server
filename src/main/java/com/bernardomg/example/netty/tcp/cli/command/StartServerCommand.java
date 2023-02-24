@@ -103,9 +103,6 @@ public final class StartServerCommand implements Runnable {
 
         // close server
         server.start();
-
-        // Close writer
-        writer.close();
     }
 
 }
