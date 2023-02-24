@@ -24,9 +24,10 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
+import java.nio.charset.Charset;
 import java.util.Objects;
 
-import com.bernardomg.example.netty.tcp.server.channel.ResponseListenerChannelInitializer;
+import com.bernardomg.example.netty.tcp.server.channel.MessageListenerChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -51,9 +52,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class NettyTcpServer implements Server {
 
-    private EventLoopGroup            bossLoopGroup;
-
+    /**
+     * Group storing the server channel.
+     */
     private ChannelGroup              channelGroup;
+
+    /**
+     * Server secondary event loop group.
+     */
+    private EventLoopGroup            childGroup;
 
     /**
      * Server listener. Extension hook which allows reacting to the server events.
@@ -66,12 +73,25 @@ public final class NettyTcpServer implements Server {
     private final String              messageForClient;
 
     /**
+     * Server main event loop group.
+     */
+    private EventLoopGroup            parentGroup;
+
+    /**
      * Port which the server will listen to.
      */
     private final Integer             port;
 
-    private EventLoopGroup            workerLoopGroup;
-
+    /**
+     * Constructs a server for the given port. The transaction listener will react to events when calling the server.
+     *
+     * @param prt
+     *            port to listen for
+     * @param resp
+     *            response to return
+     * @param lst
+     *            transaction listener
+     */
     public NettyTcpServer(final Integer prt, final String resp, final TransactionListener lst) {
         super();
 
@@ -90,13 +110,12 @@ public final class NettyTcpServer implements Server {
         listener.onStart();
 
         // Initializes groups
-        bossLoopGroup = new NioEventLoopGroup();
-        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-        workerLoopGroup = new NioEventLoopGroup();
+        parentGroup = new NioEventLoopGroup();
+        childGroup = new NioEventLoopGroup();
 
         bootstrap = new ServerBootstrap()
             // Registers groups
-            .group(bossLoopGroup, workerLoopGroup)
+            .group(parentGroup, childGroup)
             // Defines channel
             .channel(NioServerSocketChannel.class)
             // Configuration
@@ -106,11 +125,11 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new ResponseListenerChannelInitializer(this::handleRequest));
+            .childHandler(new MessageListenerChannelInitializer(this::handleRequest));
 
         try {
             // Binds to the port
-            log.debug("Binding port {}", port);
+            log.debug("Binding to port {}", port);
             channelFuture = bootstrap.bind(port)
                 .sync();
         } catch (final InterruptedException e) {
@@ -125,6 +144,7 @@ public final class NettyTcpServer implements Server {
             log.debug("Bound correctly to port {}", port);
         }
 
+        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
         channelGroup.add(channelFuture.channel());
 
         log.trace("Started server");
@@ -137,8 +157,8 @@ public final class NettyTcpServer implements Server {
         listener.onStop();
 
         channelGroup.close();
-        bossLoopGroup.shutdownGracefully();
-        workerLoopGroup.shutdownGracefully();
+        parentGroup.shutdownGracefully();
+        childGroup.shutdownGracefully();
 
         log.trace("Stopped server");
     }
@@ -160,7 +180,7 @@ public final class NettyTcpServer implements Server {
 
         listener.onReceive(request);
 
-        buf = Unpooled.wrappedBuffer(messageForClient.getBytes());
+        buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
 
         ctx.writeAndFlush(buf)
             .addListener(future -> {

@@ -28,45 +28,50 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Response listener channel handler. Will send any message to the contained listener.
+ * Initializes the channel with a message listener. Any message received by the channel will be sent to the listener.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class ResponseListenerChannelHandler extends SimpleChannelInboundHandler<String> {
+public final class MessageListenerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     /**
-     * Response listener. This will receive any response from the channel.
+     * Message listener. This will receive any response from the channel.
      */
-    private final BiConsumer<ChannelHandlerContext, String> responseListener;
+    private final BiConsumer<ChannelHandlerContext, String> listener;
 
-    /**
-     * Constructs a channel handler which will send any response to the listener.
-     *
-     * @param listener
-     *            Listener to watch for channel responses
-     */
-    public ResponseListenerChannelHandler(final BiConsumer<ChannelHandlerContext, String> listener) {
+    public MessageListenerChannelInitializer(final BiConsumer<ChannelHandlerContext, String> lstn) {
         super();
 
-        responseListener = Objects.requireNonNull(listener);
+        listener = Objects.requireNonNull(lstn);
     }
 
     @Override
-    public final void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-    }
+    protected final void initChannel(final SocketChannel ch) throws Exception {
+        final MessageListenerChannelHandler listenerHandler;
 
-    @Override
-    protected final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
-        log.debug("Received message {}", message);
+        // Message listener handler
+        // Sends any message received by the channel to the listener
+        listenerHandler = new MessageListenerChannelHandler(listener);
 
-        responseListener.accept(ctx, message);
+        log.debug("Initializing channel");
+
+        ch.pipeline()
+            // Transforms message into a string
+            .addLast("decoder", new StringDecoder())
+            // Adds event logger
+            .addLast(new EventLoggerChannelHandler())
+            // Adds listener handler
+            .addLast(listenerHandler);
+
+        log.debug("Initialized channel");
     }
 
 }

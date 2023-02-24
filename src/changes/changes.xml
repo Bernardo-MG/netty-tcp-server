@@ -18,5 +18,10 @@
                 Using generic version provider.
             </action>
         </release>
+        <release version="1.0.2" date="2023-02-24" description="Additional logs">
+            <action dev="bmg" type="add">
+                Added additional logs.
+            </action>
+        </release>
     </body>
 </document>

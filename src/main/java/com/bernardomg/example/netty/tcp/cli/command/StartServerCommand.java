@@ -26,6 +26,7 @@ package com.bernardomg.example.netty.tcp.cli.command;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 
 import com.bernardomg.example.netty.tcp.cli.CliWriterTransactionListener;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
@@ -49,9 +50,15 @@ import picocli.CommandLine.Spec;
         versionProvider = ManifestVersionProvider.class)
 public final class StartServerCommand implements Runnable {
 
-    @Parameters(index = "0", description = "Server port", paramLabel = "PORT")
+    /**
+     * Port to listen.
+     */
+    @Parameters(index = "0", description = "Port to listen", paramLabel = "PORT")
     private Integer     port;
 
+    /**
+     * Server response.
+     */
     @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue = "Acknowledged")
     private String      response;
 
@@ -77,8 +84,8 @@ public final class StartServerCommand implements Runnable {
 
     @Override
     public final void run() {
-        final PrintWriter    writer;
-        final Server         server;
+        final PrintWriter         writer;
+        final Server              server;
         final TransactionListener listener;
 
         if (verbose) {
@@ -87,12 +94,14 @@ public final class StartServerCommand implements Runnable {
                 .getOut();
         } else {
             // Prints nothing
-            writer = new PrintWriter(OutputStream.nullOutputStream());
+            writer = new PrintWriter(OutputStream.nullOutputStream(), false, Charset.defaultCharset());
         }
 
+        // Create server
         listener = new CliWriterTransactionListener(port, writer);
         server = new NettyTcpServer(port, response, listener);
 
+        // close server
         server.start();
     }
 

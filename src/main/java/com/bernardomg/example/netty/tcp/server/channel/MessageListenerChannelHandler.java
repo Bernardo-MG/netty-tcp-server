@@ -28,44 +28,40 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initializes the channel with a response listener.
+ * Message listener channel handler. Will send any message to the contained listener.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class ResponseListenerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public final class MessageListenerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     /**
-     * Response listener. This will receive any response from the channel.
+     * Channel listener. This will receive any message from the channel.
      */
-    private final BiConsumer<ChannelHandlerContext, String> responseListener;
+    private final BiConsumer<ChannelHandlerContext, String> listener;
 
-    public ResponseListenerChannelInitializer(final BiConsumer<ChannelHandlerContext, String> listener) {
+    /**
+     * Constructs a channel handler which will send any message to the listener.
+     *
+     * @param lstn
+     *            listener to watch for channel messages
+     */
+    public MessageListenerChannelHandler(final BiConsumer<ChannelHandlerContext, String> lstn) {
         super();
 
-        responseListener = Objects.requireNonNull(listener);
+        listener = Objects.requireNonNull(lstn);
     }
 
     @Override
-    protected final void initChannel(final SocketChannel ch) throws Exception {
-        final ResponseListenerChannelHandler listenerHandler;
+    public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
+        log.debug("Received message {}", message);
 
-        listenerHandler = new ResponseListenerChannelHandler(responseListener);
-
-        log.debug("Initializing channel");
-
-        ch.pipeline()
-            .addLast("decoder", new StringDecoder())
-            .addLast(listenerHandler);
-
-        log.debug("Initialized channel");
+        listener.accept(ctx, message);
     }
 
 }
