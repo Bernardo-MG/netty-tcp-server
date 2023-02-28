@@ -63,7 +63,7 @@ public final class NettyTcpServer implements Server {
     private EventLoopGroup            childGroup;
 
     /**
-     * Server listener. Extension hook which allows reacting to the server events.
+     * Transaction listener. Extension hook which allows reacting to the transaction events.
      */
     private final TransactionListener listener;
 
