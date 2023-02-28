@@ -24,16 +24,12 @@
 
 package com.bernardomg.example.netty.tcp.server;
 
-import java.nio.charset.Charset;
 import java.util.Objects;
 
 import com.bernardomg.example.netty.tcp.server.channel.MessageListenerChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
@@ -125,7 +121,9 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new MessageListenerChannelInitializer(this::handleRequest));
+            // TODO: Simplify this
+            .childHandler(new MessageListenerChannelInitializer(
+                new ListenAndAnswerTransactionHandler(messageForClient, listener)));
 
         try {
             // Binds to the port
@@ -157,38 +155,6 @@ public final class NettyTcpServer implements Server {
         childGroup.shutdownGracefully();
 
         log.trace("Stopped server");
-    }
-
-    /**
-     * Request event internal listener. Will receive any request sent by the client.
-     *
-     * @param ctx
-     *            channel context
-     * @param request
-     *            received request body
-     */
-    private final void handleRequest(final ChannelHandlerContext ctx, final String request) {
-        final ByteBuf buf;
-
-        log.debug("Handling request");
-
-        log.debug("Received request: {}", request);
-
-        listener.onReceive(request);
-
-        buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
-
-        ctx.writeAndFlush(buf)
-            .addListener(future -> {
-                final Boolean success;
-
-                log.debug("Sending response: {}", messageForClient);
-
-                listener.onSend(messageForClient);
-
-                success = future.isSuccess();
-                log.debug("Reply successful: {}", success);
-            });
     }
 
 }
