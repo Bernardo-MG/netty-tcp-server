@@ -140,10 +140,6 @@ public final class NettyTcpServer implements Server {
             throw new RuntimeException(e);
         }
 
-        if (channelFuture.isSuccess()) {
-            log.debug("Bound correctly to port {}", port);
-        }
-
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
         channelGroup.add(channelFuture.channel());
 

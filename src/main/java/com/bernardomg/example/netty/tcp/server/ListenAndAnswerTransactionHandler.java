@@ -22,56 +22,57 @@
  * SOFTWARE.
  */
 
-package com.bernardomg.example.netty.tcp.server.channel;
+package com.bernardomg.example.netty.tcp.server;
 
+import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initializes the channel with a message listener. Any message received by the channel will be sent to the listener.
+ * Transaction handler which sends all messages to the listener, and also answers back with a predefined message.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class MessageListenerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public final class ListenAndAnswerTransactionHandler implements BiConsumer<ChannelHandlerContext, String> {
 
     /**
-     * Message listener. This will receive any response from the channel.
+     * Transaction listener. Reacts to events during the request.
      */
-    private final BiConsumer<ChannelHandlerContext, String> listener;
+    private final TransactionListener listener;
 
-    public MessageListenerChannelInitializer(final BiConsumer<ChannelHandlerContext, String> lstn) {
+    /**
+     * Response to send after a request.
+     */
+    private final String              messageForClient;
+
+    public ListenAndAnswerTransactionHandler(final String msg, final TransactionListener lst) {
         super();
 
-        listener = Objects.requireNonNull(lstn);
+        messageForClient = Objects.requireNonNull(msg);
+        listener = Objects.requireNonNull(lst);
     }
 
     @Override
-    protected final void initChannel(final SocketChannel ch) throws Exception {
-        final MessageListenerChannelHandler listenerHandler;
+    public final void accept(final ChannelHandlerContext ctx, final String request) {
+        final ByteBuf buf;
 
-        // Message listener handler
-        // Sends any message received by the channel to the listener
-        listenerHandler = new MessageListenerChannelHandler(listener);
+        listener.onReceive(request);
 
-        log.debug("Initializing channel");
+        buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
 
-        ch.pipeline()
-            // Transforms message into a string
-            .addLast("encoder", new StringEncoder())
-            .addLast("decoder", new StringDecoder())
-            // Adds listener handler
-            .addLast(listenerHandler);
+        ctx.writeAndFlush(buf)
+            .addListener(future -> {
+                log.debug("Sending response: {}", messageForClient);
 
-        log.debug("Initialized channel");
+                listener.onSend(messageForClient);
+            });
     }
 
 }
