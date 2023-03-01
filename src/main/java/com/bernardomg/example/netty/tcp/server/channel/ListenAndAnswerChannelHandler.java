@@ -22,25 +22,28 @@
  * SOFTWARE.
  */
 
-package com.bernardomg.example.netty.tcp.server;
+package com.bernardomg.example.netty.tcp.server.channel;
 
 import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+
+import com.bernardomg.example.netty.tcp.server.TransactionListener;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Transaction handler which sends all messages to the listener, and also answers back with a predefined message.
+ * Message listener and answerer channel handler. Will send any message to the contained listener, and will send back a
+ * predefined response.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class ListenAndAnswerTransactionHandler implements BiConsumer<ChannelHandlerContext, String> {
+public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     /**
      * Transaction listener. Reacts to events during the request.
@@ -52,7 +55,7 @@ public final class ListenAndAnswerTransactionHandler implements BiConsumer<Chann
      */
     private final String              messageForClient;
 
-    public ListenAndAnswerTransactionHandler(final String msg, final TransactionListener lst) {
+    public ListenAndAnswerChannelHandler(final String msg, final TransactionListener lst) {
         super();
 
         messageForClient = Objects.requireNonNull(msg);
@@ -60,10 +63,12 @@ public final class ListenAndAnswerTransactionHandler implements BiConsumer<Chann
     }
 
     @Override
-    public final void accept(final ChannelHandlerContext ctx, final String request) {
+    public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
+        log.debug("Received message {}", message);
+
         final ByteBuf buf;
 
-        listener.onReceive(request);
+        listener.onReceive(message);
 
         buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
 
@@ -73,6 +78,7 @@ public final class ListenAndAnswerTransactionHandler implements BiConsumer<Chann
 
                 listener.onSend(messageForClient);
             });
+
     }
 
 }
