@@ -28,6 +28,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+
 import com.bernardomg.example.netty.tcp.cli.CliWriterTransactionListener;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
@@ -50,6 +53,12 @@ import picocli.CommandLine.Spec;
 @Command(name = "start", description = "Starts a TCP server", mixinStandardHelpOptions = true,
         versionProvider = ManifestVersionProvider.class)
 public final class StartServerCommand implements Runnable {
+
+    /**
+     * Debug flag. Shows debug logs.
+     */
+    @Option(names = { "--debug" }, paramLabel = "flag", description = "Enable debug logs.", defaultValue = "false")
+    private Boolean     debug;
 
     /**
      * Port to listen.
@@ -89,6 +98,10 @@ public final class StartServerCommand implements Runnable {
         final Server              server;
         final TransactionListener listener;
 
+        if (debug) {
+            activateDebugLog();
+        }
+
         if (verbose) {
             // Prints to console
             writer = spec.commandLine()
@@ -104,6 +117,14 @@ public final class StartServerCommand implements Runnable {
 
         // close server
         server.start();
+    }
+
+    /**
+     * Activates debug logs for the application.
+     */
+    private final void activateDebugLog() {
+        Configurator.setLevel("com.bernardomg.example", Level.DEBUG);
+        Configurator.setLevel("io.netty.handler.logging", Level.DEBUG);
     }
 
 }
