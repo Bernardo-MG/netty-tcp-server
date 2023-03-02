@@ -63,12 +63,8 @@ public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAd
     }
 
     @Override
-    public final void channelRead(final ChannelHandlerContext ctx, final Object message) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         final ByteBuf buf;
-
-        log.debug("Received message {}", message);
-
-        listener.onReceive(message.toString());
 
         buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
 
@@ -76,10 +72,19 @@ public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAd
             .addListener(future -> {
                 log.debug("Sending response: {}", messageForClient);
 
+                if (!future.isSuccess()) {
+                    log.error("Failed sending response {}", messageForClient);
+                }
+
                 listener.onSend(messageForClient);
             });
+    }
 
-        ctx.fireChannelRead(message);
+    @Override
+    public final void channelRead(final ChannelHandlerContext ctx, final Object message) throws Exception {
+        log.debug("Received message {}", message);
+
+        listener.onReceive(message.toString());
     }
 
 }
