@@ -32,7 +32,7 @@ import com.bernardomg.example.netty.tcp.server.TransactionListener;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHandler<String> {
+public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * Transaction listener. Reacts to events during the request.
@@ -63,12 +63,12 @@ public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHan
     }
 
     @Override
-    public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
+    public final void channelRead(final ChannelHandlerContext ctx, final Object message) throws Exception {
         final ByteBuf buf;
 
         log.debug("Received message {}", message);
 
-        listener.onReceive(message);
+        listener.onReceive(message.toString());
 
         buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
 
@@ -78,6 +78,8 @@ public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHan
 
                 listener.onSend(messageForClient);
             });
+
+        ctx.fireChannelRead(message);
     }
 
 }

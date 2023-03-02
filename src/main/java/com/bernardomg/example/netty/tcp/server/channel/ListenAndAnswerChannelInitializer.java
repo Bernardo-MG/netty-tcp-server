@@ -24,9 +24,10 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
+import java.util.Objects;
+
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
@@ -48,12 +49,15 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public final class ListenAndAnswerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final ChannelHandler channelHandler;
+    final TransactionListener listener;
+
+    final String              message;
 
     public ListenAndAnswerChannelInitializer(final String msg, final TransactionListener lst) {
         super();
 
-        channelHandler = new ListenAndAnswerChannelHandler(msg, lst);
+        message = Objects.requireNonNull(msg);
+        listener = Objects.requireNonNull(lst);
     }
 
     @Override
@@ -66,7 +70,7 @@ public final class ListenAndAnswerChannelInitializer extends ChannelInitializer<
             .addLast(new LoggingHandler())
             // Sends messages to the listener
             // Sends the response after any request
-            .addLast(channelHandler);
+            .addLast(new ListenAndAnswerChannelHandler(message, listener));
     }
 
 }
