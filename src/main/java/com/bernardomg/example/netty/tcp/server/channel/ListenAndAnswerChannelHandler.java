@@ -64,9 +64,9 @@ public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHan
 
     @Override
     public final void channelRead0(final ChannelHandlerContext ctx, final String message) throws Exception {
-        log.debug("Received message {}", message);
-
         final ByteBuf buf;
+
+        log.debug("Received message {}", message);
 
         listener.onReceive(message);
 
@@ -78,7 +78,6 @@ public final class ListenAndAnswerChannelHandler extends SimpleChannelInboundHan
 
                 listener.onSend(messageForClient);
             });
-
     }
 
 }
