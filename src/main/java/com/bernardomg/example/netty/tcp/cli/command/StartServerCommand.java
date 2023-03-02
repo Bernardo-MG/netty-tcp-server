@@ -115,7 +115,7 @@ public final class StartServerCommand implements Runnable {
         listener = new CliWriterTransactionListener(port, writer);
         server = new NettyTcpServer(port, response, listener);
 
-        // close server
+        // Start server
         server.start();
     }
 
