@@ -19,7 +19,7 @@
 
    <groupId>com.bernardomg.example</groupId>
    <artifactId>netty-tcp-server-example</artifactId>
-   <version>1.0.2</version>
+   <version>1.0.3</version>
    <packaging>jar</packaging>
 
    <name>Netty TCP Server Example</name>
@@ -195,6 +195,7 @@
       <!-- =================== NETTY ==================== -->
       <!-- ============================================== -->
       <dependency>
+         <!-- Netty all -->
          <groupId>io.netty</groupId>
          <artifactId>netty-all</artifactId>
          <version>${netty.version}</version>
@@ -207,6 +208,12 @@
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
          <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+         <!-- Log4j API -->
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-api</artifactId>
+         <version>${log4j.version}</version>
       </dependency>
       <dependency>
          <!-- Log4j SLF4J Bridge -->
