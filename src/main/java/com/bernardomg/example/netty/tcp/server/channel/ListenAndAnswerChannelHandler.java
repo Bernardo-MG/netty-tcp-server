@@ -76,7 +76,7 @@ public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAd
                     log.error("Failed sending response {}", messageForClient);
                 }
 
-                listener.onSend(messageForClient);
+                listener.onResponse(messageForClient);
             });
     }
 
@@ -84,7 +84,7 @@ public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAd
     public final void channelRead(final ChannelHandlerContext ctx, final Object message) throws Exception {
         log.debug("Received message {}", message);
 
-        listener.onReceive(message.toString());
+        listener.onRequest(message.toString());
     }
 
 }
