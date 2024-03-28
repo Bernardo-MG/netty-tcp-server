@@ -41,7 +41,6 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
 /**
@@ -63,13 +62,14 @@ public final class StartServerCommand implements Runnable {
     /**
      * Port to listen.
      */
-    @Parameters(index = "0", description = "Port to listen", paramLabel = "PORT")
+    @Option(names = { "-p", "--port" }, paramLabel = "port", description = "Port to listen.", required = true)
     private Integer     port;
 
     /**
-     * Server response.
+     * Response to return.
      */
-    @Parameters(index = "1", description = "Server response", paramLabel = "RESP", defaultValue = "Acknowledged")
+    @Option(names = { "-r", "--response" }, paramLabel = "response",
+            description = "Response to send back after receiving a request.", defaultValue = "Acknowledged")
     private String      response;
 
     /**
