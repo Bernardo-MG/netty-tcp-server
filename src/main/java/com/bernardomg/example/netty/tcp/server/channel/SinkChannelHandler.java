@@ -24,59 +24,32 @@
 
 package com.bernardomg.example.netty.tcp.server.channel;
 
-import java.nio.charset.Charset;
 import java.util.Objects;
 
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Inbound handler which sends all messages to the listener, and also answers back with a predefined message.
+ * Inbound handler which sends all received messages to the listener, but responds nothing.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Slf4j
-public final class ListenAndAnswerChannelHandler extends ChannelInboundHandlerAdapter {
+public final class SinkChannelHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * Transaction listener. Reacts to events during the request.
      */
     private final TransactionListener listener;
 
-    /**
-     * Response to send after a request.
-     */
-    private final String              messageForClient;
-
-    public ListenAndAnswerChannelHandler(final String msg, final TransactionListener lst) {
+    public SinkChannelHandler(final TransactionListener lst) {
         super();
 
-        messageForClient = Objects.requireNonNull(msg);
         listener = Objects.requireNonNull(lst);
-    }
-
-    @Override
-    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
-        final ByteBuf buf;
-
-        buf = Unpooled.wrappedBuffer(messageForClient.getBytes(Charset.defaultCharset()));
-
-        ctx.writeAndFlush(buf)
-            .addListener(future -> {
-                log.debug("Sending response: {}", messageForClient);
-
-                if (!future.isSuccess()) {
-                    log.error("Failed sending response {}", messageForClient);
-                }
-
-                listener.onResponse(messageForClient);
-            });
     }
 
     @Override

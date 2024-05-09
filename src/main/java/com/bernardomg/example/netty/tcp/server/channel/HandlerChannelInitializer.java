@@ -48,6 +48,9 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public final class HandlerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
+    /**
+     * Adapter to set on the pipeline.
+     */
     private final ChannelInboundHandlerAdapter adapter;
 
     public HandlerChannelInitializer(final ChannelInboundHandlerAdapter adpt) {
