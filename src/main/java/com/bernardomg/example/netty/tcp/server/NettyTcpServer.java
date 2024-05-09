@@ -26,15 +26,18 @@ package com.bernardomg.example.netty.tcp.server;
 
 import java.util.Objects;
 
-import com.bernardomg.example.netty.tcp.server.channel.ListenAndAnswerChannelInitializer;
+import com.bernardomg.example.netty.tcp.server.channel.HandlerChannelInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,49 +54,51 @@ public final class NettyTcpServer implements Server {
     /**
      * Group storing the server channel.
      */
-    private ChannelGroup              channelGroup;
+    private ChannelGroup                            channelGroup;
+
+    /**
+     * Channel initializer.
+     */
+    private final ChannelInitializer<SocketChannel> channelInitializer;
 
     /**
      * Server secondary event loop group.
      */
-    private EventLoopGroup            childGroup;
+    private EventLoopGroup                          childGroup;
 
     /**
      * Transaction listener. Extension hook which allows reacting to the transaction events.
      */
-    private final TransactionListener listener;
-
-    /**
-     * Response to send after a request.
-     */
-    private final String              messageForClient;
+    private final TransactionListener               listener;
 
     /**
      * Server main event loop group.
      */
-    private EventLoopGroup            parentGroup;
+    private EventLoopGroup                          parentGroup;
 
     /**
      * Port which the server will listen to.
      */
-    private final Integer             port;
+    private final Integer                           port;
 
     /**
      * Constructs a server for the given port. The transaction listener will react to events when calling the server.
      *
      * @param prt
      *            port to listen for
-     * @param resp
-     *            response to return
      * @param lst
      *            transaction listener
+     * @param adapter
+     *            channel handler adapter
      */
-    public NettyTcpServer(final Integer prt, final String resp, final TransactionListener lst) {
+    public NettyTcpServer(final Integer prt, final TransactionListener lst,
+            final ChannelInboundHandlerAdapter adapter) {
         super();
 
         port = Objects.requireNonNull(prt);
-        messageForClient = Objects.requireNonNull(resp);
         listener = Objects.requireNonNull(lst);
+
+        channelInitializer = new HandlerChannelInitializer(adapter);
     }
 
     @Override
@@ -121,7 +126,7 @@ public final class NettyTcpServer implements Server {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
             // Child handler
-            .childHandler(new ListenAndAnswerChannelInitializer(messageForClient, listener));
+            .childHandler(channelInitializer);
 
         try {
             // Binds to the port
