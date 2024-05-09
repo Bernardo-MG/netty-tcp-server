@@ -36,7 +36,9 @@ import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
 import com.bernardomg.example.netty.tcp.server.Server;
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
+import com.bernardomg.example.netty.tcp.server.channel.ListenAndAnswerChannelHandler;
 
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Model.CommandSpec;
@@ -94,9 +96,10 @@ public final class StartServerCommand implements Runnable {
 
     @Override
     public final void run() {
-        final PrintWriter         writer;
-        final Server              server;
-        final TransactionListener listener;
+        final PrintWriter                  writer;
+        final Server                       server;
+        final TransactionListener          listener;
+        final ChannelInboundHandlerAdapter adapter;
 
         if (debug) {
             activateDebugLog();
@@ -113,7 +116,8 @@ public final class StartServerCommand implements Runnable {
 
         // Create server
         listener = new TransactionPrinterListener(port, writer);
-        server = new NettyTcpServer(port, response, listener);
+        adapter = new ListenAndAnswerChannelHandler(response, listener);
+        server = new NettyTcpServer(port, listener, adapter);
 
         // Start server
         server.start();

@@ -26,8 +26,7 @@ package com.bernardomg.example.netty.tcp.server.channel;
 
 import java.util.Objects;
 
-import com.bernardomg.example.netty.tcp.server.TransactionListener;
-
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
@@ -35,29 +34,26 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * Initializes the channel with handlers for listening to transactions and sending back a predefined message.
+ * Initializes the channel with handlers for listening to transactions, and the received handler.
  * <p>
  * It takes care of:
  * <ul>
  * <li>Encoding/decoding messages to/from string</li>
  * <li>Activating Netty logging</li>
- * <li>Adding a {@link ListenAndAnswerChannelHandler}</li>
+ * <li>Adding a {@link ChannelInboundHandlerAdapter}</li>
  * </ul>
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
-public final class ListenAndAnswerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public final class HandlerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    final TransactionListener listener;
+    private final ChannelInboundHandlerAdapter adapter;
 
-    final String              message;
-
-    public ListenAndAnswerChannelInitializer(final String msg, final TransactionListener lst) {
+    public HandlerChannelInitializer(final ChannelInboundHandlerAdapter adpt) {
         super();
 
-        message = Objects.requireNonNull(msg);
-        listener = Objects.requireNonNull(lst);
+        adapter = Objects.requireNonNull(adpt);
     }
 
     @Override
@@ -70,7 +66,7 @@ public final class ListenAndAnswerChannelInitializer extends ChannelInitializer<
             .addLast(new LoggingHandler())
             // Sends messages to the listener
             // Sends the response after any request
-            .addLast(new ListenAndAnswerChannelHandler(message, listener));
+            .addLast(adapter);
     }
 
 }
