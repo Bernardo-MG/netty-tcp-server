@@ -37,6 +37,7 @@ import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
 import com.bernardomg.example.netty.tcp.server.Server;
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
 import com.bernardomg.example.netty.tcp.server.channel.ListenAndAnswerChannelHandler;
+import com.bernardomg.example.netty.tcp.server.channel.SinkChannelHandler;
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import picocli.CommandLine.Command;
@@ -46,15 +47,14 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 /**
- * Start server with response command. This creates a server which listens for requests, and responds with a defined
- * message.
+ * Start server. This creates a server which listens for requests, if the response is defined it will also answer them.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
 @Command(name = "start", description = "Starts a TCP server", mixinStandardHelpOptions = true,
         versionProvider = ManifestVersionProvider.class)
-public final class StartServerWithResponseCommand implements Runnable {
+public final class StartServerCommand implements Runnable {
 
     /**
      * Debug flag. Shows debug logs.
@@ -72,7 +72,7 @@ public final class StartServerWithResponseCommand implements Runnable {
      * Response to return.
      */
     @Option(names = { "-r", "--response" }, paramLabel = "response",
-            description = "Response to send back after receiving a request.", defaultValue = "Acknowledged")
+            description = "Response to send back after receiving a request.")
     private String      response;
 
     /**
@@ -91,7 +91,7 @@ public final class StartServerWithResponseCommand implements Runnable {
     /**
      * Default constructor.
      */
-    public StartServerWithResponseCommand() {
+    public StartServerCommand() {
         super();
     }
 
@@ -117,7 +117,12 @@ public final class StartServerWithResponseCommand implements Runnable {
 
         // Create server
         listener = new TransactionPrinterListener(port, writer);
-        adapter = new ListenAndAnswerChannelHandler(response, listener);
+        if (response == null) {
+            // Missing response, will just sink requests
+            adapter = new SinkChannelHandler(listener);
+        } else {
+            adapter = new ListenAndAnswerChannelHandler(response, listener);
+        }
         server = new NettyTcpServer(port, listener, adapter);
 
         // Start server

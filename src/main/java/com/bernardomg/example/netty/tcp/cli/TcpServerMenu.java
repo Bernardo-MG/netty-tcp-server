@@ -24,8 +24,7 @@
 
 package com.bernardomg.example.netty.tcp.cli;
 
-import com.bernardomg.example.netty.tcp.cli.command.StartServerSinkCommand;
-import com.bernardomg.example.netty.tcp.cli.command.StartServerWithResponseCommand;
+import com.bernardomg.example.netty.tcp.cli.command.StartServerCommand;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 
 import picocli.CommandLine.Command;
@@ -36,9 +35,8 @@ import picocli.CommandLine.Command;
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
-@Command(description = "TCP server",
-        subcommands = { StartServerWithResponseCommand.class, StartServerSinkCommand.class },
-        mixinStandardHelpOptions = true, versionProvider = ManifestVersionProvider.class)
+@Command(description = "TCP server", subcommands = { StartServerCommand.class }, mixinStandardHelpOptions = true,
+        versionProvider = ManifestVersionProvider.class)
 public class TcpServerMenu {
 
     /**
