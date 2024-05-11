@@ -36,8 +36,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Message listener and answerer channel handler. Will send any message to the contained listener, and will send back a
- * predefined response.
+ * Inbound handler which sends all messages to the listener, and also answers back with a predefined message.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *

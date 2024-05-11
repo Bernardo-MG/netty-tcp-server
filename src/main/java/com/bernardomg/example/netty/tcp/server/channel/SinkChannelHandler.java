@@ -28,49 +28,35 @@ import java.util.Objects;
 
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initializes the channel with handlers for listening to transactions and sending back a predefined message.
- * <p>
- * It takes care of:
- * <ul>
- * <li>Encoding/decoding messages to/from string</li>
- * <li>Activating Netty logging</li>
- * <li>Adding a {@link ListenAndAnswerChannelHandler}</li>
- * </ul>
+ * Inbound handler which sends all received messages to the listener, but responds nothing.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
  */
-public final class ListenAndAnswerChannelInitializer extends ChannelInitializer<SocketChannel> {
+@Slf4j
+public final class SinkChannelHandler extends ChannelInboundHandlerAdapter {
 
-    final TransactionListener listener;
+    /**
+     * Transaction listener. Reacts to events during the request.
+     */
+    private final TransactionListener listener;
 
-    final String              message;
-
-    public ListenAndAnswerChannelInitializer(final String msg, final TransactionListener lst) {
+    public SinkChannelHandler(final TransactionListener lst) {
         super();
 
-        message = Objects.requireNonNull(msg);
         listener = Objects.requireNonNull(lst);
     }
 
     @Override
-    protected final void initChannel(final SocketChannel ch) throws Exception {
-        ch.pipeline()
-            // Transforms message into a string
-            .addLast("encoder", new StringEncoder())
-            .addLast("decoder", new StringDecoder())
-            // Logging handler
-            .addLast(new LoggingHandler())
-            // Sends messages to the listener
-            // Sends the response after any request
-            .addLast(new ListenAndAnswerChannelHandler(message, listener));
+    public final void channelRead(final ChannelHandlerContext ctx, final Object message) throws Exception {
+        log.debug("Received message {}", message);
+
+        listener.onRequest(message.toString());
     }
 
 }

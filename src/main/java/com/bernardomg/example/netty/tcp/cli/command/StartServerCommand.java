@@ -31,12 +31,15 @@ import java.nio.charset.Charset;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import com.bernardomg.example.netty.tcp.cli.CliWriterTransactionListener;
+import com.bernardomg.example.netty.tcp.cli.TransactionPrinterListener;
 import com.bernardomg.example.netty.tcp.cli.version.ManifestVersionProvider;
 import com.bernardomg.example.netty.tcp.server.NettyTcpServer;
 import com.bernardomg.example.netty.tcp.server.Server;
 import com.bernardomg.example.netty.tcp.server.TransactionListener;
+import com.bernardomg.example.netty.tcp.server.channel.ListenAndAnswerChannelHandler;
+import com.bernardomg.example.netty.tcp.server.channel.SinkChannelHandler;
 
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Model.CommandSpec;
@@ -44,7 +47,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 /**
- * Start server command.
+ * Start server. This creates a server which listens for requests, if the response is defined it will also answer them.
  *
  * @author Bernardo Mart&iacute;nez Garrido
  *
@@ -57,7 +60,7 @@ public final class StartServerCommand implements Runnable {
      * Debug flag. Shows debug logs.
      */
     @Option(names = { "--debug" }, paramLabel = "flag", description = "Enable debug logs.", defaultValue = "false")
-    private Boolean     debug;
+    private boolean     debug;
 
     /**
      * Port to listen.
@@ -69,7 +72,7 @@ public final class StartServerCommand implements Runnable {
      * Response to return.
      */
     @Option(names = { "-r", "--response" }, paramLabel = "response",
-            description = "Response to send back after receiving a request.", defaultValue = "Acknowledged")
+            description = "Response to send back after receiving a request.")
     private String      response;
 
     /**
@@ -83,7 +86,7 @@ public final class StartServerCommand implements Runnable {
      */
     @Option(names = { "--verbose" }, paramLabel = "flag", description = "Print information to console.",
             defaultValue = "true", showDefaultValue = Help.Visibility.ALWAYS)
-    private Boolean     verbose;
+    private boolean     verbose;
 
     /**
      * Default constructor.
@@ -94,9 +97,10 @@ public final class StartServerCommand implements Runnable {
 
     @Override
     public final void run() {
-        final PrintWriter         writer;
-        final Server              server;
-        final TransactionListener listener;
+        final PrintWriter                  writer;
+        final Server                       server;
+        final TransactionListener          listener;
+        final ChannelInboundHandlerAdapter adapter;
 
         if (debug) {
             activateDebugLog();
@@ -112,8 +116,14 @@ public final class StartServerCommand implements Runnable {
         }
 
         // Create server
-        listener = new CliWriterTransactionListener(port, writer);
-        server = new NettyTcpServer(port, response, listener);
+        listener = new TransactionPrinterListener(port, writer);
+        if (response == null) {
+            // Missing response, will just sink requests
+            adapter = new SinkChannelHandler(listener);
+        } else {
+            adapter = new ListenAndAnswerChannelHandler(response, listener);
+        }
+        server = new NettyTcpServer(port, listener, adapter);
 
         // Start server
         server.start();
